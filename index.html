@@ -1,1234 +1,1138 @@
 ```html
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="dark h-full bg-slate-950">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ApexVault - Next-Gen Financial Simulator</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts (Inter & JetBrains Mono) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-  <!-- Canvas Confetti for Transaction Success -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              cyan: '#06b6d4',
-              emerald: '#10b981',
-              pink: '#ec4899',
-              dark: '#0b0f19',
-              card: '#111827',
-              border: '#1f2937'
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Horizon Treasury | Enterprise Capital Engine</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        apex: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0265d2',
+                            900: '#0f172a',
+                            950: '#030712'
+                        },
+                        gold: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706'
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            950: '#022c22'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
             }
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          }
         }
-      }
-    }
-  </script>
-
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0b0f19;
-      color: #f3f4f6;
-      overflow-x: hidden;
-    }
-
-    /* Custom Glassmorphism Effect */
-    .glass-card {
-      background: rgba(17, 24, 39, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .glass-card-glow {
-      box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.15);
-    }
-
-    .glow-cyan {
-      box-shadow: 0 0 20px -3px rgba(6, 182, 212, 0.3);
-    }
-
-    /* Animated Gradients */
-    .gradient-text {
-      background: linear-gradient(135deg, #6366f1 0%, #06b6d4 50%, #10b981 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .gradient-bg {
-      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0b0f19;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #1f2937;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #374151;
-    }
-
-    /* Pulse Beam effect */
-    @keyframes pulse-light {
-      0%, 100% { opacity: 0.2; transform: scale(1); }
-      50% { opacity: 0.6; transform: scale(1.05); }
-    }
-    .ambient-glow {
-      animation: pulse-light 8s infinite ease-in-out;
-    }
-
-    /* Print styling for receipts */
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      #receipt-modal-content, #receipt-modal-content * {
-        visibility: visible;
-      }
-      #receipt-modal-content {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        color: black !important;
-        background: white !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-    }
-  </style>
+    </script>
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome & Phosphor Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+    <style>
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel-glow {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 25px -5px rgba(2, 132, 199, 0.15);
+        }
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .ticker-move {
+            display: inline-block;
+            animation: ticker 35s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
 </head>
-<body class="min-h-screen relative flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased h-full overflow-x-hidden">
 
-  <!-- Background Ambient Glows -->
-  <div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none ambient-glow z-0"></div>
-  <div class="fixed bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-cyan-600/20 rounded-full blur-[120px] pointer-events-none ambient-glow z-0" style="animation-delay: 4s;"></div>
-
-  <!-- Toast Notification System -->
-  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
-
-  <!-- MAIN APP CONTAINER -->
-  <div id="app" class="relative z-10 min-h-screen flex flex-col">
-
-    <!-- ================================================================= -->
-    <!-- 1. AUTHENTICATION / GATEKEEPER SCREEN -->
-    <!-- ================================================================= -->
-    <section id="auth-screen" class="min-h-screen flex items-center justify-center p-4">
-      <div class="w-full max-w-md">
-        <!-- Logo Header -->
-        <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-bg mb-4 shadow-lg shadow-indigo-500/30">
-            <i class="fa-solid fa-vault text-2xl text-white"></i>
-          </div>
-          <h1 class="text-3xl font-extrabold tracking-tight text-white">Apex<span class="gradient-text">Vault</span></h1>
-          <p class="text-gray-400 text-sm mt-1">Institutional Financial Simulator Platform</p>
+    <!-- Top Interbank Real-Time Settlement Ticker -->
+    <div class="bg-slate-900 border-b border-slate-800 text-xs py-1.5 px-4 flex items-center justify-between relative z-50">
+        <div class="flex items-center space-x-2 text-slate-400 font-mono text-[11px] shrink-0 pr-4 border-r border-slate-800">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="font-bold text-slate-200">SWIFT GPI / FedNow LIVE NODE</span>
+            <span class="text-slate-500">|</span>
+            <span class="text-emerald-400">AES-256 SSL CONNECTED</span>
         </div>
-
-        <!-- Login Card -->
-        <div class="glass-card glass-card-glow rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-          <div class="absolute top-0 left-0 right-0 h-1 gradient-bg"></div>
-
-          <h2 class="text-xl font-bold text-white mb-2">Access Portal</h2>
-          <p class="text-xs text-gray-400 mb-6">Enter an authorized system email to verify simulation identity.</p>
-
-          <form id="auth-form" onsubmit="handleAuthSubmit(event)">
-            <div class="mb-4">
-              <label for="auth-email" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
-                System Email Address
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                  <i class="fa-regular fa-envelope"></i>
-                </div>
-                <input 
-                  type="email" 
-                  id="auth-email" 
-                  required
-                  placeholder="e.g. user@bank.com"
-                  class="w-full pl-10 pr-4 py-3 bg-gray-900/80 border border-gray-700/70 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                >
-              </div>
+        <div class="ticker-wrap flex-1 mx-4 text-slate-300 font-mono text-[11px]">
+            <div class="ticker-move space-x-8">
+                <span>EUR/USD: <span class="text-emerald-400 font-bold">1.0842 ▲ +0.12%</span></span>
+                <span>GBP/USD: <span class="text-emerald-400 font-bold">1.2655 ▲ +0.08%</span></span>
+                <span>USD/JPY: <span class="text-rose-400 font-bold">154.20 ▼ -0.31%</span></span>
+                <span>BTC/USD V-CLEAR: <span class="text-emerald-400 font-bold">$94,820.50 ▲ +2.4%</span></span>
+                <span>FEDNOW INSTANT SETTLEMENT: <span class="text-slate-400">ACTIVE [32ms latency]</span></span>
+                <span>CHIPS NETTING CYCLE: <span class="text-slate-400">NEXT CLEARED IN 04:12</span></span>
+                <span>EUR/USD: <span class="text-emerald-400 font-bold">1.0842 ▲ +0.12%</span></span>
+                <span>GBP/USD: <span class="text-emerald-400 font-bold">1.2655 ▲ +0.08%</span></span>
+                <span>USD/JPY: <span class="text-rose-400 font-bold">154.20 ▼ -0.31%</span></span>
             </div>
-
-            <!-- Pre-populated Demo Hints -->
-            <div class="mb-6">
-              <span class="text-[11px] text-gray-400 block mb-2 font-medium">Demo Authorized Accounts (Click to fill):</span>
-              <div class="flex flex-wrap gap-2">
-                <button type="button" onclick="fillDemoEmail('user@bank.com')" class="text-xs bg-gray-800/80 hover:bg-gray-700 text-indigo-300 px-2.5 py-1 rounded-lg border border-indigo-500/20 transition-all">user@bank.com</button>
-                <button type="button" onclick="fillDemoEmail('admin@sim.com')" class="text-xs bg-gray-800/80 hover:bg-gray-700 text-cyan-300 px-2.5 py-1 rounded-lg border border-cyan-500/20 transition-all">admin@sim.com</button>
-                <button type="button" onclick="fillDemoEmail('client@finance.org')" class="text-xs bg-gray-800/80 hover:bg-gray-700 text-emerald-300 px-2.5 py-1 rounded-lg border border-emerald-500/20 transition-all">client@finance.org</button>
-              </div>
-            </div>
-
-            <button 
-              type="submit" 
-              class="w-full py-3.5 px-4 gradient-bg hover:opacity-95 font-semibold rounded-xl text-white text-sm shadow-lg shadow-indigo-500/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
-            >
-              <span>Authenticate & Enter System</span>
-              <i class="fa-solid fa-arrow-right text-xs"></i>
-            </button>
-          </form>
-
-          <div class="mt-6 pt-5 border-t border-gray-800/80 text-center">
-            <p class="text-xs text-gray-500 flex items-center justify-center gap-1.5">
-              <i class="fa-solid fa-shield-halved text-emerald-400"></i>
-              <span>Simulated Environment • Zero Real Funds Stored</span>
-            </p>
-          </div>
         </div>
-      </div>
-    </section>
-
-
-    <!-- ================================================================= -->
-    <!-- 2. MAIN APPLICATION INTERFACE (Hidden by Default) -->
-    <!-- ================================================================= -->
-    <div id="main-interface" class="hidden flex-1 flex flex-col">
-
-      <!-- Top Header Navigation -->
-      <header class="glass-card border-b border-gray-800 sticky top-0 z-30 px-4 lg:px-8 py-3.5">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-          
-          <!-- Brand / Logo -->
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center shadow-md shadow-indigo-500/20">
-              <i class="fa-solid fa-vault text-white text-lg"></i>
-            </div>
-            <div>
-              <div class="font-extrabold text-white text-lg leading-none">Apex<span class="gradient-text">Vault</span></div>
-              <span class="text-[10px] text-gray-400 tracking-wider uppercase font-semibold">Simulation Engine v2.4</span>
-            </div>
-          </div>
-
-          <!-- User Quick Profile & Logout -->
-          <div class="flex items-center gap-4">
-            <div class="hidden sm:flex items-center gap-3 bg-gray-900/80 border border-gray-800 px-3 py-1.5 rounded-xl">
-              <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-              <span id="user-display-email" class="text-xs font-mono text-gray-300">user@bank.com</span>
-              <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-md font-semibold border border-indigo-500/30">Verified</span>
-            </div>
-
-            <button 
-              onclick="logout()" 
-              class="p-2 sm:px-3 sm:py-1.5 text-xs text-gray-400 hover:text-white bg-gray-800/50 hover:bg-red-500/10 hover:border-red-500/30 border border-gray-700/50 rounded-xl transition-all flex items-center gap-2"
-              title="End Session"
-            >
-              <i class="fa-solid fa-right-from-bracket"></i>
-              <span class="hidden sm:inline">Log Out</span>
-            </button>
-          </div>
+        <div class="flex items-center space-x-3 text-xs font-mono text-slate-400 shrink-0 border-l border-slate-800 pl-4">
+            <span id="live-utc-clock">UTC 00:00:00</span>
+            <span class="px-2 py-0.5 rounded bg-slate-800 text-sky-400 text-[10px] font-semibold uppercase">LEI: 5493001KJ957283L9012</span>
         </div>
-      </header>
+    </div>
 
-      <!-- Main Container with Navigation Tabs -->
-      <main class="max-w-7xl mx-auto w-full px-4 lg:px-8 py-8 flex-1 flex flex-col gap-6">
+    <!-- MAIN APP CONTAINER -->
+    <div id="app-viewport" class="min-h-[calc(100vh-32px)] flex flex-col">
 
-        <!-- Navigation Tabs Bar -->
-        <div class="flex items-center gap-2 border-b border-gray-800 overflow-x-auto pb-2 scrollbar-none">
-          <button 
-            id="tab-overview" 
-            onclick="switchTab('overview')"
-            class="px-4 py-2.5 text-sm font-semibold rounded-xl transition-all flex items-center gap-2 text-white bg-indigo-600/30 border border-indigo-500/40"
-          >
-            <i class="fa-solid fa-chart-pie text-xs"></i>
-            <span>Overview & History</span>
-          </button>
+        <!-- ========================================== -->
+        <!-- VIEW 1: ENTERPRISE AUTHENTICATION & GATEWAY -->
+        <!-- ========================================== -->
+        <div id="auth-portal" class="flex-1 flex items-center justify-center p-6 relative overflow-hidden">
+            <!-- Ambient Background Mesh -->
+            <div class="absolute -top-40 -left-40 w-96 h-96 bg-sky-600/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-          <button 
-            id="tab-transaction" 
-            onclick="switchTab('transaction')"
-            class="px-4 py-2.5 text-sm font-semibold rounded-xl text-gray-400 hover:text-white hover:bg-gray-800/60 border border-transparent transition-all flex items-center gap-2"
-          >
-            <i class="fa-solid fa-paper-plane text-xs"></i>
-            <span>New Transaction</span>
-          </button>
-
-          <button 
-            id="tab-connect" 
-            onclick="switchTab('connect')"
-            class="px-4 py-2.5 text-sm font-semibold rounded-xl text-gray-400 hover:text-white hover:bg-gray-800/60 border border-transparent transition-all flex items-center gap-2"
-          >
-            <i class="fa-solid fa-link text-xs"></i>
-            <span>Connect Account / Wallet</span>
-          </button>
-        </div>
-
-
-        <!-- =============================================================== -->
-        <!-- TAB 1: OVERVIEW & HISTORY -->
-        <!-- =============================================================== -->
-        <div id="content-overview" class="space-y-6">
-          
-          <!-- Balance & Quick Stats Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <!-- Main Total Balance Card -->
-            <div class="md:col-span-2 glass-card rounded-3xl p-6 relative overflow-hidden flex flex-col justify-between border border-gray-800">
-              <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
-              
-              <div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Simulated Total Net Worth</span>
-                  <span class="text-xs bg-emerald-500/20 text-emerald-400 font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
-                    <i class="fa-solid fa-arrow-trend-up text-[10px]"></i> +4.2% Simulated
-                  </span>
-                </div>
-
-                <div class="text-3xl sm:text-4xl font-extrabold text-white font-mono tracking-tight my-2">
-                  $<span id="total-balance-display">24,850.00</span> <span class="text-sm font-normal text-gray-400">USD</span>
-                </div>
-              </div>
-
-              <!-- Quick Action Pills & Wallet Quick Info -->
-              <div class="mt-6 pt-4 border-t border-gray-800/80 flex flex-wrap items-center justify-between gap-3">
-                <div class="flex items-center gap-2 text-xs text-gray-400">
-                  <i class="fa-solid fa-credit-card text-indigo-400"></i>
-                  <span>Active Card Balance:</span>
-                  <strong class="text-white font-mono">$<span id="active-card-balance">12,400.00</span></strong>
-                </div>
-
-                <div class="flex items-center gap-2">
-                  <button onclick="switchTab('transaction')" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-3 py-1.5 rounded-lg transition-all">
-                    + Transfer Funds
-                  </button>
-                  <button onclick="switchTab('connect')" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium px-3 py-1.5 rounded-lg transition-all">
-                    Link Source
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Linked External Sources Summary Card -->
-            <div class="glass-card rounded-3xl p-6 flex flex-col justify-between border border-gray-800">
-              <div>
-                <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-sm font-bold text-white">Linked Sources</h3>
-                  <span id="linked-count-badge" class="text-xs bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full font-mono">1 Active</span>
-                </div>
-
-                <div id="linked-accounts-list" class="space-y-3">
-                  <!-- Default mock account -->
-                  <div class="flex items-center justify-between p-2.5 bg-gray-900/60 rounded-xl border border-gray-800">
-                    <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">
-                        <i class="fa-solid fa-building-columns"></i>
-                      </div>
-                      <div>
-                        <div class="text-xs font-semibold text-white">Chase Institutional</div>
-                        <div class="text-[10px] text-gray-400 font-mono">•••• 8842 (US)</div>
-                      </div>
+            <div class="w-full max-w-md glass-panel-glow rounded-2xl p-8 shadow-2xl relative z-10 border border-slate-800">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-sky-600 to-indigo-600 mb-4 shadow-lg shadow-sky-500/30">
+                        <i class="fa-solid fa-vault text-2xl text-white"></i>
                     </div>
-                    <span class="text-xs font-mono font-semibold text-emerald-400">$12,450</span>
-                  </div>
+                    <h1 class="text-2xl font-bold tracking-tight text-white">APEX HORIZON</h1>
+                    <p class="text-xs uppercase tracking-widest text-sky-400 font-semibold mt-1">Enterprise Capital Engine & Treasury Protocol</p>
                 </div>
-              </div>
 
-              <button onclick="switchTab('connect')" class="mt-4 w-full py-2 text-center text-xs text-indigo-400 hover:text-indigo-300 font-medium hover:underline">
-                + Link New Bank or Crypto Wallet
-              </button>
+                <!-- Form Steps -->
+                <form id="auth-form" onsubmit="handleAuthentication(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Corporate Entity Access Email</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-building-columns absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+                            <input type="email" id="auth-email" required value="treasury.director@apexglobal.com" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all" placeholder="corporate.id@domain.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">HSM Token / Authorization Pin</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-key absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+                            <input type="password" id="auth-token" required value="894012847102" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all font-mono" placeholder="••••••••••••">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" checked class="rounded border-slate-700 bg-slate-900 text-sky-600 focus:ring-sky-500">
+                            <span>Biometric Hardware Handshake</span>
+                        </label>
+                        <a href="#" class="text-sky-400 hover:text-sky-300">Vault Recovery</a>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white font-semibold rounded-xl text-sm transition-all shadow-lg shadow-sky-600/25 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Authenticate Sovereign Session</span>
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+                    Protected by Multi-Vault HSM Protocols & Zero-Knowledge Cryptographic Proofs.
+                </div>
             </div>
-          </div>
+        </div>
 
-          <!-- Transaction History Table Card -->
-          <div class="glass-card rounded-3xl p-6 border border-gray-800">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <div>
-                <h3 class="text-lg font-bold text-white">Simulated Activity Ledger</h3>
-                <p class="text-xs text-gray-400">Real-time audit log of executed simulation payloads.</p>
-              </div>
+        <!-- ========================================== -->
+        <!-- VIEW 2: MAIN TREASURY PORTAL (HIDDEN AT START) -->
+        <!-- ========================================== -->
+        <div id="treasury-portal" class="hidden flex-1 flex flex-col min-h-screen">
 
-              <!-- Filter & Clear Buttons -->
-              <div class="flex items-center gap-2">
-                <button onclick="clearHistory()" class="text-xs bg-gray-800/80 hover:bg-gray-700 text-gray-400 hover:text-white px-3 py-1.5 rounded-xl transition-all">
-                  <i class="fa-solid fa-trash-can mr-1"></i> Clear Log
+            <!-- Primary Header Navigation -->
+            <header class="glass-panel sticky top-0 z-40 border-b border-slate-800">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    
+                    <!-- Left: Brand & Vault Selector -->
+                    <div class="flex items-center space-x-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20">
+                                <i class="fa-solid fa-vault text-white text-base"></i>
+                            </div>
+                            <div>
+                                <span class="font-bold text-white tracking-tight text-base block leading-none">APEX HORIZON</span>
+                                <span class="text-[10px] text-sky-400 font-mono tracking-widest uppercase">Liquidity Portal v8.4.2</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Vault Indicator Switcher -->
+                        <div class="hidden md:flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 space-x-1">
+                            <button onclick="switchVault('USD')" id="vault-btn-USD" class="px-3 py-1 rounded-md text-xs font-semibold bg-sky-600 text-white transition-all">USD Primary Vault</button>
+                            <button onclick="switchVault('EUR')" id="vault-btn-EUR" class="px-3 py-1 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition-all">EUR Clearing</button>
+                            <button onclick="switchVault('GBP')" id="vault-btn-GBP" class="px-3 py-1 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition-all">GBP Treasury</button>
+                            <button onclick="switchVault('BTC')" id="vault-btn-BTC" class="px-3 py-1 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition-all">Crypto Multi-Chain</button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Quick Actions & Profile -->
+                    <div class="flex items-center space-x-4">
+                        <button onclick="openModal('modal-settlement')" class="bg-sky-600 hover:bg-sky-500 text-white font-medium text-xs px-3.5 py-2 rounded-lg transition-all shadow-md shadow-sky-600/20 flex items-center space-x-1.5">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Initiate Transfer</span>
+                        </button>
+                        <button onclick="openModal('modal-account-link')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs px-3.5 py-2 rounded-lg transition-all flex items-center space-x-1.5">
+                            <i class="fa-solid fa-link"></i>
+                            <span class="hidden sm:inline">Connect Gateway</span>
+                        </button>
+
+                        <!-- Notification Bell with Counter -->
+                        <div class="relative">
+                            <button onclick="toggleNotifications()" class="p-2 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg relative">
+                                <i class="fa-regular fa-bell"></i>
+                                <span id="notif-badge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-sky-500 text-[10px] font-bold text-white flex items-center justify-center">3</span>
+                            </button>
+                            <!-- Dropdown Box -->
+                            <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 glass-panel-glow rounded-xl p-4 shadow-2xl z-50 border border-slate-800 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                                    <span class="text-xs font-bold uppercase text-slate-300">System Activity Alerts</span>
+                                    <span class="text-[10px] text-sky-400">Live Wire Logging</span>
+                                </div>
+                                <div class="space-y-2 text-xs">
+                                    <div class="p-2 rounded bg-slate-900/80 border border-slate-800">
+                                        <div class="text-slate-200 font-semibold">FedNow Gross Clearing Confirmed</div>
+                                        <div class="text-[10px] text-slate-400">$1,250,000.00 USD via LEI 894021</div>
+                                    </div>
+                                    <div class="p-2 rounded bg-slate-900/80 border border-slate-800">
+                                        <div class="text-slate-200 font-semibold">SWIFT GPI Message Received</div>
+                                        <div class="text-[10px] text-slate-400">Ref: UETR-8940-2104-991A</div>
+                                    </div>
+                                    <div class="p-2 rounded bg-slate-900/80 border border-slate-800">
+                                        <div class="text-slate-200 font-semibold">Automated Ledger Reconciliation Complete</div>
+                                        <div class="text-[10px] text-emerald-400">0 Discrepancies Detected</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Avatar Block -->
+                        <div class="flex items-center space-x-3 pl-2 border-l border-slate-800">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-sky-500 text-white font-bold flex items-center justify-center text-xs">
+                                TD
+                            </div>
+                            <div class="hidden lg:block text-left">
+                                <div class="text-xs font-semibold text-slate-200" id="user-display-email">treasury.director@apexglobal.com</div>
+                                <div class="text-[10px] text-slate-400">Chief Investment Vault Officer</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Body -->
+            <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+                <!-- TOP METRICS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Total Consolidated Balance -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Consolidated Liquidity</p>
+                                <h2 class="text-2xl font-bold font-mono text-white mt-1" id="metric-total-balance">$48,920,410.50</h2>
+                            </div>
+                            <span class="p-2 rounded-lg bg-sky-500/10 text-sky-400">
+                                <i class="fa-solid fa-scale-balanced text-lg"></i>
+                            </span>
+                        </div>
+                        <div class="mt-4 flex items-center text-xs space-x-2">
+                            <span class="text-emerald-400 font-semibold flex items-center">
+                                <i class="fa-solid fa-arrow-trend-up mr-1"></i> +4.12%
+                            </span>
+                            <span class="text-slate-500">vs previous settlement cycle</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Yield Allocation -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Automated APY Yield Rate</p>
+                                <h2 class="text-2xl font-bold font-mono text-emerald-400 mt-1">5.42% <span class="text-xs text-slate-400 font-sans">weighted</span></h2>
+                            </div>
+                            <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                                <i class="fa-solid fa-chart-line text-lg"></i>
+                            </span>
+                        </div>
+                        <div class="mt-4 flex items-center text-xs space-x-2">
+                            <span class="text-slate-300 font-semibold">$2,410,200</span>
+                            <span class="text-slate-500">yield accrued YTD</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Interbank Rail -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Clearing Gateway</p>
+                                <h2 class="text-xl font-bold font-mono text-sky-400 mt-1" id="active-vault-title">USD PRIMARY VAULT</h2>
+                            </div>
+                            <span class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                                <i class="fa-solid fa-network-wired text-lg"></i>
+                            </span>
+                        </div>
+                        <div class="mt-4 flex items-center text-xs justify-between text-slate-400 font-mono">
+                            <span>RTGS / SWIFT GPI</span>
+                            <span class="text-emerald-400">ONLINE</span>
+                        </div>
+                    </div>
+
+                    <!-- Security Protocol State -->
+                    <div class="glass-panel p-5 rounded-2xl border border-slate-800">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">HSM Vault Protocol</p>
+                                <h2 class="text-xl font-bold font-mono text-emerald-400 mt-1">FIPS 140-3 LEVEL 4</h2>
+                            </div>
+                            <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                                <i class="fa-solid fa-shield-virus text-lg"></i>
+                            </span>
+                        </div>
+                        <div class="mt-4 flex items-center text-xs space-x-2 text-slate-400">
+                            <i class="fa-solid fa-lock text-emerald-400"></i>
+                            <span>Zero Discrepancy Integrity Audit</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN CHARTS & ANALYTICS SECTION -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Analytics Panel (2 Columns) -->
+                    <div class="lg:col-span-2 glass-panel p-6 rounded-2xl border border-slate-800 space-y-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-base font-bold text-white">Liquidity Flow & Net Settlement Analytics</h3>
+                                <p class="text-xs text-slate-400">Real-time intrastate asset movement across capital pools</p>
+                            </div>
+                            <div class="flex items-center space-x-2 bg-slate-900 p-1 rounded-lg border border-slate-800">
+                                <button onclick="updateChartRange('7D')" class="px-2.5 py-1 rounded text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800">7D</button>
+                                <button onclick="updateChartRange('1M')" class="px-2.5 py-1 rounded text-xs font-medium bg-sky-600 text-white">1M</button>
+                                <button onclick="updateChartRange('1Y')" class="px-2.5 py-1 rounded text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800">1Y</button>
+                            </div>
+                        </div>
+
+                        <!-- Canvas Chart Container -->
+                        <div class="h-72 w-full">
+                            <canvas id="analyticsChart"></canvas>
+                        </div>
+
+                        <!-- Mini Liquidity Breakdown Indicators -->
+                        <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-800/80 text-center">
+                            <div>
+                                <span class="text-[11px] text-slate-400 block uppercase font-medium">Spot Cash Reserve</span>
+                                <span class="text-sm font-mono font-bold text-slate-100">$22,410,000</span>
+                            </div>
+                            <div>
+                                <span class="text-[11px] text-slate-400 block uppercase font-medium">Overnight Yield Sweep</span>
+                                <span class="text-sm font-mono font-bold text-emerald-400">$18,500,410</span>
+                            </div>
+                            <div>
+                                <span class="text-[11px] text-slate-400 block uppercase font-medium">Tokenized Treasury Bills</span>
+                                <span class="text-sm font-mono font-bold text-sky-400">$8,010,000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Multi-Currency Vault Matrix (1 Column) -->
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-base font-bold text-white">Vault Ledger Breakdown</h3>
+                                <button onclick="openModal('modal-account-link')" class="text-xs text-sky-400 hover:underline flex items-center gap-1">
+                                    <i class="fa-solid fa-plus"></i> Add Account
+                                </button>
+                            </div>
+
+                            <div class="space-y-3">
+                                <!-- USD Item -->
+                                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all cursor-pointer" onclick="switchVault('USD')">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                                            $
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-200">USD Sovereign Vault</div>
+                                            <div class="text-[10px] text-slate-500 font-mono">IBAN: US94APEX001928471</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xs font-mono font-bold text-white">$28,450,210.00</div>
+                                        <div class="text-[10px] text-emerald-400">Primary Reserve</div>
+                                    </div>
+                                </div>
+
+                                <!-- EUR Item -->
+                                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all cursor-pointer" onclick="switchVault('EUR')">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold text-xs">
+                                            €
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-200">EUR TARGET2 Clearing</div>
+                                            <div class="text-[10px] text-slate-500 font-mono">IBAN: DE893704004405320</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xs font-mono font-bold text-white">€12,180,000.00</div>
+                                        <div class="text-[10px] text-sky-400">ECB Settlement</div>
+                                    </div>
+                                </div>
+
+                                <!-- GBP Item -->
+                                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all cursor-pointer" onclick="switchVault('GBP')">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                                            £
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-200">GBP CHAPS Account</div>
+                                            <div class="text-[10px] text-slate-500 font-mono">Sort: 60-83-71</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xs font-mono font-bold text-white">£4,820,100.00</div>
+                                        <div class="text-[10px] text-indigo-400">BoE Direct</div>
+                                    </div>
+                                </div>
+
+                                <!-- Crypto / Web3 Vault -->
+                                <div class="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all cursor-pointer" onclick="switchVault('BTC')">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-lg bg-gold-500/20 text-gold-400 flex items-center justify-center font-bold text-xs">
+                                            <i class="fa-brands fa-bitcoin"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-200">Digital Asset Cold Reserve</div>
+                                            <div class="text-[10px] text-slate-500 font-mono">Vault Hash: 0x89...4F2A</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-xs font-mono font-bold text-white">142.50 BTC</div>
+                                        <div class="text-[10px] text-gold-400">$13,512,000 Equivalent</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Encryption Badge -->
+                        <div class="mt-6 p-3 rounded-xl bg-slate-900/50 border border-slate-800/80 flex items-center justify-between text-xs">
+                            <span class="text-slate-400 font-mono text-[11px]">Consensus Protocol</span>
+                            <span class="text-emerald-400 font-mono text-[11px] font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check"></i> Multi-Sig Verified
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TRANSACTION & AUDIT LEDGER SECTION -->
+                <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-white">Immutable Audit Ledger & Settlement Receipts</h3>
+                            <p class="text-xs text-slate-400">Cryptographically verified real-time transfer history</p>
+                        </div>
+                        <div class="flex items-center space-x-3 w-full sm:w-auto">
+                            <input type="text" id="ledger-search" onkeyup="filterLedger()" placeholder="Search LEI, UETR, Hash..." class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-sky-500 w-full sm:w-64 font-mono">
+                            <button onclick="exportLedgerCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 shrink-0">
+                                <i class="fa-solid fa-download"></i> Export Audit Log
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Ledger Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-[11px] font-mono uppercase text-slate-400 border-b border-slate-800">
+                                    <th class="py-3 px-4">TIMESTAMP</th>
+                                    <th class="py-3 px-4">TRANSACTION REFERENCE / UETR</th>
+                                    <th class="py-3 px-4">COUNTERPARTY / LEI</th>
+                                    <th class="py-3 px-4">CLEARING RAIL</th>
+                                    <th class="py-3 px-4 text-right">VOLUME</th>
+                                    <th class="py-3 px-4 text-center">SETTLEMENT STATE</th>
+                                    <th class="py-3 px-4 text-center">AUDIT RECEIPT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledger-tbody" class="text-xs divide-y divide-slate-800/60 font-mono">
+                                <!-- Initial Hardcoded Enterprise Transactions -->
+                                <tr class="hover:bg-slate-900/50 transition-all">
+                                    <td class="py-3.5 px-4 text-slate-400">2026-10-23 14:22:04</td>
+                                    <td class="py-3.5 px-4 text-slate-200 font-bold">UETR-894021-APEX-901</td>
+                                    <td class="py-3.5 px-4">
+                                        <div class="text-slate-200 font-sans font-semibold">J.P. Morgan Clearing Corp</div>
+                                        <div class="text-[10px] text-slate-500">LEI: 7H6GLXDRUGV219481</div>
+                                    </td>
+                                    <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800 text-[10px]">FedNow RTGS</span></td>
+                                    <td class="py-3.5 px-4 text-right font-bold text-emerald-400">+$2,500,000.00 USD</td>
+                                    <td class="py-3.5 px-4 text-center"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px]">FINALIZED</span></td>
+                                    <td class="py-3.5 px-4 text-center">
+                                        <button onclick="viewReceipt('UETR-894021-APEX-901', 'J.P. Morgan Clearing Corp', '$2,500,000.00 USD', 'FedNow RTGS', 'Credit Settlement')" class="text-sky-400 hover:text-sky-300 underline text-[11px]">Receipt</button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-slate-900/50 transition-all">
+                                    <td class="py-3.5 px-4 text-slate-400">2026-10-23 11:05:18</td>
+                                    <td class="py-3.5 px-4 text-slate-200 font-bold">UETR-771042-ECB-112</td>
+                                    <td class="py-3.5 px-4">
+                                        <div class="text-slate-200 font-sans font-semibold">BNP Paribas Treasury GmbH</div>
+                                        <div class="text-[10px] text-slate-500">LEI: R0210491823901A84</div>
+                                    </td>
+                                    <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded bg-indigo-950 text-indigo-400 border border-indigo-800 text-[10px]">SWIFT GPI</span></td>
+                                    <td class="py-3.5 px-4 text-right font-bold text-rose-400">-$1,120,000.00 USD</td>
+                                    <td class="py-3.5 px-4 text-center"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px]">FINALIZED</span></td>
+                                    <td class="py-3.5 px-4 text-center">
+                                        <button onclick="viewReceipt('UETR-771042-ECB-112', 'BNP Paribas Treasury GmbH', '-$1,120,000.00 USD', 'SWIFT GPI', 'Debit Transfer')" class="text-sky-400 hover:text-sky-300 underline text-[11px]">Receipt</button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-slate-900/50 transition-all">
+                                    <td class="py-3.5 px-4 text-slate-400">2026-10-22 18:40:11</td>
+                                    <td class="py-3.5 px-4 text-slate-200 font-bold">UETR-001928-BTC-884</td>
+                                    <td class="py-3.5 px-4">
+                                        <div class="text-slate-200 font-sans font-semibold">Coinbase Custody Trust Co.</div>
+                                        <div class="text-[10px] text-slate-500">LEI: 549300V310492819</div>
+                                    </td>
+                                    <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded bg-gold-950 text-gold-400 border border-gold-800 text-[10px]">Multi-Sig Web3</span></td>
+                                    <td class="py-3.5 px-4 text-right font-bold text-emerald-400">+15.00 BTC</td>
+                                    <td class="py-3.5 px-4 text-center"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px]">FINALIZED</span></td>
+                                    <td class="py-3.5 px-4 text-center">
+                                        <button onclick="viewReceipt('UETR-001928-BTC-884', 'Coinbase Custody Trust Co.', '+15.00 BTC', 'Multi-Sig Web3 Vault', 'Crypto Reserve Deposit')" class="text-sky-400 hover:text-sky-300 underline text-[11px]">Receipt</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Footer Status Bar -->
+            <footer class="border-t border-slate-800 bg-slate-950/80 py-4 px-6 text-xs text-slate-500 flex flex-col md:flex-row justify-between items-center gap-2 font-mono">
+                <div>
+                    © 2026 APEX HORIZON GLOBAL TREASURY MANAGEMENT CORP. ALL RIGHTS RESERVED.
+                </div>
+                <div class="flex items-center space-x-4 text-[11px]">
+                    <span class="text-emerald-400"><i class="fa-solid fa-network-wired mr-1"></i>NODE LATENCY: 14ms</span>
+                    <span>SECURITY: HSM LEVEL 4</span>
+                    <span>SESSION: SECURE-AES-GCM</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL 1: ADVANCED SETTLEMENT / TRANSFER ENGINE -->
+    <!-- ========================================== -->
+    <div id="modal-settlement" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div class="glass-panel-glow w-full max-w-2xl rounded-2xl p-6 border border-slate-800 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-600/20 text-sky-400 flex items-center justify-center">
+                        <i class="fa-solid fa-paper-plane text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Initiate Interbank Settlement Wire</h3>
+                        <p class="text-xs text-slate-400">Execute real-time gross settlement via sovereign clearinghouses</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('modal-settlement')" class="text-slate-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
-              </div>
             </div>
 
-            <!-- History Table -->
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead>
-                  <tr class="border-b border-gray-800 text-gray-400 font-medium uppercase tracking-wider">
-                    <th class="pb-3 px-3">Transaction ID / Type</th>
-                    <th class="pb-3 px-3">Counterparty</th>
-                    <th class="pb-3 px-3">Date & Time</th>
-                    <th class="pb-3 px-3">Amount</th>
-                    <th class="pb-3 px-3 text-center">Status</th>
-                    <th class="pb-3 px-3 text-right">Receipt</th>
-                  </tr>
-                </thead>
-                <tbody id="transaction-history-body" class="divide-y divide-gray-800/60 text-gray-300 font-mono">
-                  <!-- Populated dynamically via JS -->
-                </tbody>
-              </table>
-            </div>
-          </div>
+            <form id="settlement-form" onsubmit="executeSettlementSequence(event)" class="space-y-4">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Source Vault -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Source Capital Liquidity Vault</label>
+                        <select id="wire-source-vault" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-sky-500">
+                            <option value="USD">USD Sovereign Vault ($28,450,210.00)</option>
+                            <option value="EUR">EUR TARGET2 Clearing (€12,180,000.00)</option>
+                            <option value="GBP">GBP CHAPS Account (£4,820,100.00)</option>
+                            <option value="BTC">Digital Asset Cold Reserve (142.50 BTC)</option>
+                        </select>
+                    </div>
 
-        </div>
-
-
-        <!-- =============================================================== -->
-        <!-- TAB 2: NEW TRANSACTION SIMULATION -->
-        <!-- =============================================================== -->
-        <div id="content-transaction" class="hidden space-y-6">
-          <div class="max-w-2xl mx-auto glass-card rounded-3xl p-6 sm:p-8 border border-gray-800">
-            
-            <div class="mb-6">
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-paper-plane text-indigo-400"></i>
-                <span>Execute Transfer Simulation</span>
-              </h2>
-              <p class="text-xs text-gray-400">Simulate a real-time ledger settlement across domestic or international channels.</p>
-            </div>
-
-            <!-- Mode Selector (Debit / Credit / Wire) -->
-            <div class="grid grid-cols-2 gap-3 mb-6">
-              <button 
-                type="button" 
-                id="mode-debit" 
-                onclick="setTransactionMode('debit')"
-                class="py-3 px-4 rounded-xl border font-medium text-xs flex items-center justify-center gap-2 transition-all bg-indigo-600/30 border-indigo-500 text-white shadow-md shadow-indigo-500/10"
-              >
-                <i class="fa-solid fa-minus-circle text-indigo-400"></i>
-                <span>Debit Transfer (Send)</span>
-              </button>
-
-              <button 
-                type="button" 
-                id="mode-credit" 
-                onclick="setTransactionMode('credit')"
-                class="py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/60 text-gray-400 font-medium text-xs flex items-center justify-center gap-2 transition-all hover:border-gray-700"
-              >
-                <i class="fa-solid fa-plus-circle text-emerald-400"></i>
-                <span>Credit Load (Receive)</span>
-              </button>
-            </div>
-
-            <!-- Form -->
-            <form id="transaction-form" onsubmit="handleTransactionSubmit(event)" class="space-y-4">
-              
-              <!-- Recipient / Sender Name Grid -->
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">First Name</label>
-                  <input type="text" id="tx-first-name" required placeholder="Alexander" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <!-- Interbank Protocol Rail -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Clearing Network Rail</label>
+                        <select id="wire-rail" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-sky-500">
+                            <option value="FedNow RTGS">FedNow Real-Time Instant Clearing</option>
+                            <option value="SWIFT GPI">SWIFT GPI High-Value Cross-Border</option>
+                            <option value="CHIPS Netting">CHIPS Interbank Netting System</option>
+                            <option value="Web3 Multi-Sig Protocol">Cryptographic On-Chain Vault Settlement</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Middle Name</label>
-                  <input type="text" id="tx-middle-name" placeholder="V." class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Last Name</label>
-                  <input type="text" id="tx-last-name" required placeholder="Hamilton" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-              </div>
 
-              <!-- Bank Name & Amount -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Institution / Bank Name</label>
-                  <input type="text" id="tx-bank-name" required placeholder="J.P. Morgan Chase" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <!-- Beneficiary Entity LEI & Name -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Beneficiary Entity Name</label>
+                        <input type="text" id="wire-beneficiary-name" required placeholder="e.g. Barclays Institutional Treasury" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Legal Entity Identifier (LEI)</label>
+                        <input type="text" id="wire-beneficiary-lei" required placeholder="20-character ISO 17442 LEI" value="549300210491823901A" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500">
+                    </div>
                 </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Transfer Amount ($ USD)</label>
-                  <input type="number" id="tx-amount" min="1" max="100000" step="0.01" required placeholder="1250.00" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-              </div>
 
-              <!-- Card Number / Account Number -->
-              <div>
-                <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Card / IBAN / Account Number</label>
-                <div class="relative">
-                  <input type="text" id="tx-card-number" maxlength="19" required placeholder="4532 •••• •••• 8892" oninput="formatCardNumber(this)" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  <div class="absolute right-3 top-2.5 text-gray-400 text-sm">
-                    <i class="fa-solid fa-credit-card"></i>
-                  </div>
+                <!-- Account / Routing / SWIFT BIC -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">SWIFT BIC / Routing Code</label>
+                        <input type="text" id="wire-swift" required value="BARCGB22XXX" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">IBAN / Account Identifier</label>
+                        <input type="text" id="wire-iban" required value="GB82BARC20201530948101" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500">
+                    </div>
                 </div>
-              </div>
 
-              <!-- Expiry & CVV Grid -->
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Expiry Date (MM/YY)</label>
-                  <input type="text" id="tx-expiry" maxlength="5" placeholder="08/28" oninput="formatExpiry(this)" required class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <!-- Transfer Amount & ISO Purpose Code -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Transfer Volume (Amount)</label>
+                        <input type="number" step="0.01" id="wire-amount" required placeholder="0.00" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">ISO 20022 Purpose Code</label>
+                        <select id="wire-purpose" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-sky-500">
+                            <option value="INTC">INTC - Intra-Company Capital Rebalance</option>
+                            <option value="TREA">TREA - Treasury Management Operation</option>
+                            <option value="COLL">COLL - Collateral Asset Transfer</option>
+                            <option value="SUPP">SUPP - Commercial Institutional Settlement</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">CVV / Security Code</label>
-                  <input type="password" id="tx-cvv" maxlength="4" required placeholder="•••" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-              </div>
 
-              <!-- Simulation Trigger Options -->
-              <div class="p-3 bg-gray-900/50 rounded-xl border border-gray-800 text-xs space-y-2">
-                <span class="font-semibold text-gray-300 block">Simulation Result Override:</span>
-                <div class="flex items-center gap-4 text-gray-400">
-                  <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="sim-outcome" value="success" checked class="text-indigo-600 focus:ring-0">
-                    <span class="text-emerald-400 font-medium">Force Success</span>
-                  </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer">
-                    <input type="radio" name="sim-outcome" value="failure" class="text-indigo-600 focus:ring-0">
-                    <span class="text-red-400 font-medium">Simulate Network Failure</span>
-                  </label>
+                <!-- Corporate Debit Card Clearing Card Option -->
+                <div class="pt-2 border-t border-slate-800">
+                    <label class="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+                        <input type="checkbox" id="enable-card-clearing" onchange="toggleCardFields(this)" class="rounded border-slate-700 bg-slate-900 text-sky-600">
+                        <span>Route Settlement via Corporate Credit Liquidity Rail</span>
+                    </label>
                 </div>
-              </div>
 
-              <!-- Submit Button -->
-              <button 
-                type="submit" 
-                class="w-full py-3.5 px-4 gradient-bg hover:opacity-95 text-white font-semibold rounded-xl text-sm shadow-lg shadow-indigo-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-4"
-              >
-                <i class="fa-solid fa-bolt text-xs"></i>
-                <span>Initiate Settlement Protocol</span>
-              </button>
+                <!-- Hidden Card Details Grid -->
+                <div id="card-fields-container" class="hidden p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Cardholder Entity Name</label>
+                            <input type="text" placeholder="APEX HORIZON CORP" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Issuing Bank Institution</label>
+                            <select class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white">
+                                <option>Apex Institutional Bank NA</option>
+                                <option>J.P. Morgan Chase Commercial</option>
+                                <option>HSBC Corporate Banking</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="col-span-2">
+                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">16-Digit Corporate Card Number</label>
+                            <input type="text" placeholder="4532 9012 8841 0092" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-400 mb-1">CVV2 Protocol</label>
+                            <input type="password" maxlength="4" placeholder="892" class="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-white font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex items-center justify-end space-x-3 border-t border-slate-800">
+                    <button type="button" onclick="closeModal('modal-settlement')" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-semibold text-xs rounded-lg transition-all shadow-lg shadow-sky-600/30 flex items-center space-x-2">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Sign & Dispatch Wire</span>
+                    </button>
+                </div>
             </form>
-          </div>
         </div>
+    </div>
 
-
-        <!-- =============================================================== -->
-        <!-- TAB 3: CONNECT ACCOUNT / WALLET -->
-        <!-- =============================================================== -->
-        <div id="content-connect" class="hidden space-y-6">
-          <div class="max-w-2xl mx-auto glass-card rounded-3xl p-6 sm:p-8 border border-gray-800">
-            
-            <div class="mb-6">
-              <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-link text-cyan-400"></i>
-                <span>Link External Financial Source</span>
-              </h2>
-              <p class="text-xs text-gray-400">Connect a traditional bank account or decentralized crypto web3 wallet.</p>
+    <!-- ========================================== -->
+    <!-- MODAL 2: HIGH-TECH CLEARING PROGRESS ANIMATION -->
+    <!-- ========================================== -->
+    <div id="modal-processing" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-lg">
+        <div class="glass-panel-glow w-full max-w-md rounded-2xl p-8 border border-sky-500/30 shadow-2xl text-center space-y-6">
+            <div class="relative w-20 h-20 mx-auto">
+                <div class="absolute inset-0 rounded-full border-4 border-sky-500/20 animate-ping"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-t-sky-500 border-r-transparent border-b-indigo-500 border-l-transparent animate-spin"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-sky-400">
+                    <i class="fa-solid fa-network-wired text-xl"></i>
+                </div>
             </div>
 
-            <!-- Source Type Switcher -->
-            <div class="flex border-b border-gray-800 mb-6">
-              <button 
-                type="button" 
-                id="connect-type-bank" 
-                onclick="setConnectType('bank')"
-                class="pb-3 px-4 text-xs font-semibold border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-2"
-              >
-                <i class="fa-solid fa-building-columns"></i>
-                <span>Traditional Bank Account</span>
-              </button>
-              <button 
-                type="button" 
-                id="connect-type-crypto" 
-                onclick="setConnectType('crypto')"
-                class="pb-3 px-4 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2"
-              >
-                <i class="fa-brands fa-bitcoin"></i>
-                <span>Crypto / Web3 Wallet</span>
-              </button>
+            <div>
+                <h3 class="text-lg font-bold text-white tracking-tight">Cryptographic Clearing In Progress</h3>
+                <p id="processing-step-text" class="text-xs font-mono text-sky-400 mt-2">Connecting to Interbank Gateway Node...</p>
             </div>
 
-            <!-- Form -->
-            <form id="connect-form" onsubmit="handleConnectSubmit(event)" class="space-y-4">
-              
-              <!-- Bank Specific Fields -->
-              <div id="bank-fields" class="space-y-4">
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Select Country</label>
-                  <select id="conn-country" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="United States">United States (USD)</option>
-                    <option value="United Kingdom">United Kingdom (GBP)</option>
-                    <option value="European Union">European Union (EUR)</option>
-                    <option value="Kenya">Kenya (KES)</option>
-                    <option value="Japan">Japan (JPY)</option>
-                    <option value="Canada">Canada (CAD)</option>
-                  </select>
-                </div>
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                <div id="processing-bar" class="bg-gradient-to-r from-sky-500 to-indigo-500 h-full w-0 transition-all duration-500"></div>
+            </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Bank Name</label>
-                    <input type="text" id="conn-bank-name" placeholder="Citibank, N.A." class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Account Number / IBAN</label>
-                    <input type="text" id="conn-account-num" placeholder="US902200112233" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                  </div>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">SWIFT / Routing / Sort Code</label>
-                  <input type="text" id="conn-swift" placeholder="CITIUS33XXX" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-              </div>
-
-              <!-- Crypto Specific Fields (Hidden initially) -->
-              <div id="crypto-fields" class="hidden space-y-4">
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Network / Blockchain</label>
-                  <select id="conn-crypto-net" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <option value="Ethereum Mainnet">Ethereum (ETH)</option>
-                    <option value="Solana Network">Solana (SOL)</option>
-                    <option value="Bitcoin Network">Bitcoin (BTC)</option>
-                    <option value="Polygon POS">Polygon (MATIC)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label class="block text-[11px] font-semibold text-gray-400 uppercase mb-1">Public Wallet Address</label>
-                  <input type="text" id="conn-wallet-address" placeholder="0x71C...39A2 or Solana address" class="w-full px-3 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-xs text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-              </div>
-
-              <button 
-                type="submit" 
-                class="w-full py-3.5 px-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:opacity-95 text-white font-semibold rounded-xl text-sm shadow-lg shadow-cyan-500/20 active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-4"
-              >
-                <i class="fa-solid fa-plug text-xs"></i>
-                <span>Simulate Gateway Integration</span>
-              </button>
-            </form>
-          </div>
+            <div class="p-3 rounded-lg bg-slate-900/80 border border-slate-800 text-[11px] font-mono text-slate-400 text-left space-y-1">
+                <div>UETR: <span id="proc-uetr" class="text-slate-200">Generating...</span></div>
+                <div>LEI Handshake: <span class="text-emerald-400">VERIFIED ISO 17442</span></div>
+                <div>Consensus Engine: <span class="text-slate-200">Zero-Knowledge Ledger Proof</span></div>
+            </div>
         </div>
-
-      </main>
-
-      <!-- Footer -->
-      <footer class="border-t border-gray-800/80 py-4 px-6 text-center text-xs text-gray-500">
-        <p>ApexVault Financial Simulation Environment • Purely Front-End Interactive Prototype • No Real Money or Accounts Processed</p>
-      </footer>
     </div>
 
-  </div>
+    <!-- ========================================== -->
+    <!-- MODAL 3: AUDIT RECEIPT & REPORT GENERATOR -->
+    <!-- ========================================== -->
+    <div id="modal-receipt" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div class="glass-panel-glow w-full max-w-lg rounded-2xl p-6 border border-slate-800 shadow-2xl relative space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-file-invoice text-emerald-400 text-lg"></i>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Official Audit Settlement Statement</h3>
+                </div>
+                <button onclick="closeModal('modal-receipt')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
+            <!-- Printable Receipt Inner Content -->
+            <div id="receipt-printable-area" class="bg-slate-900 p-6 rounded-xl border border-slate-800 text-slate-200 space-y-4 font-mono text-xs">
+                <div class="flex justify-between items-start border-b border-slate-800 pb-4">
+                    <div>
+                        <div class="font-bold text-sm text-white font-sans">APEX HORIZON GLOBAL TREASURY</div>
+                        <div class="text-[10px] text-slate-400">Clearing & Interbank Settlement Division</div>
+                        <div class="text-[10px] text-slate-500">LEI: 5493001KJ957283L9012</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] text-emerald-400 font-bold uppercase">SETTLEMENT FINALIZED</div>
+                        <div class="text-[10px] text-slate-400" id="receipt-timestamp">2026-10-23 15:04:12 UTC</div>
+                    </div>
+                </div>
 
-  <!-- ================================================================= -->
-  <!-- MODAL: MULTI-STEP LOADING ANIMATION -->
-  <!-- ================================================================= -->
-  <div id="processing-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="glass-card max-w-sm w-full rounded-3xl p-8 border border-gray-800 text-center relative overflow-hidden">
-      <!-- Glow effect -->
-      <div class="absolute -top-10 -left-10 w-32 h-32 bg-indigo-500/20 rounded-full blur-xl"></div>
-      
-      <!-- Spinner -->
-      <div class="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-        <div class="absolute inset-0 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 border-r-cyan-400 animate-spin"></div>
-        <i class="fa-solid fa-vault text-2xl text-indigo-400"></i>
-      </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Transaction Ref (UETR):</span>
+                        <span class="font-bold text-sky-400" id="receipt-uetr">UETR-894021-9901</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Settlement Type:</span>
+                        <span id="receipt-type" class="text-slate-200">Direct Wire Settlement</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Counterparty Entity:</span>
+                        <span id="receipt-beneficiary" class="font-semibold text-slate-100">Barclays Capital</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Interbank Rail:</span>
+                        <span id="receipt-rail" class="text-slate-200">FedNow RTGS Network</span>
+                    </div>
+                    <div class="flex justify-between pt-2 border-t border-slate-800">
+                        <span class="text-slate-300 font-bold">Cleared Volume:</span>
+                        <span id="receipt-amount" class="text-base font-bold text-emerald-400">$2,500,000.00 USD</span>
+                    </div>
+                </div>
 
-      <h3 class="text-lg font-bold text-white mb-1">Processing Payload</h3>
-      <p class="text-xs text-gray-400 mb-6">Communicating with simulated bank node...</p>
+                <!-- Digital Signature Block & Mock QR Code -->
+                <div class="pt-4 border-t border-slate-800 flex items-center justify-between text-[10px]">
+                    <div class="space-y-1">
+                        <div class="text-slate-400">SHA-256 Digital Signature Digest:</div>
+                        <div class="text-slate-500 break-all w-60">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</div>
+                    </div>
+                    <!-- Minimalist Inline SVG QR Code Placeholder -->
+                    <div class="w-12 h-12 bg-white p-1 rounded flex items-center justify-center shrink-0">
+                        <svg viewBox="0 0 24 24" class="w-full h-full text-slate-950 fill-current">
+                            <path d="M2,2H10V10H2V2M4,4V8H8V4H4M11,2H13V4H11V2M14,2H22V10H14V2M16,4V8H20V4H16M2,14H10V22H2V14M4,16V20H8V16H4M11,11H13V13H11V11M14,11H16V13H14V11M18,11H20V13H18V11M11,14H13V16H11V14M14,14H18V16H14V14M19,14H22V17H19V14M11,18H13V22H11V18M14,18H16V20H14V18M17,18H19V20H17V18M20,18H22V22H20V18Z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
 
-      <!-- Step Status Console -->
-      <div class="space-y-3 text-left bg-gray-900/90 p-3.5 rounded-xl border border-gray-800 font-mono text-xs">
-        <div id="step-1" class="flex items-center gap-2 text-gray-500">
-          <i class="fa-solid fa-circle-notch animate-spin text-indigo-400"></i>
-          <span>Encrypting payload...</span>
+            <div class="flex items-center justify-end space-x-3 pt-2">
+                <button onclick="downloadReceiptText()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg border border-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-code"></i> Download Audit Signature
+                </button>
+                <button onclick="window.print()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs rounded-lg font-semibold flex items-center gap-1.5 shadow-md shadow-sky-600/20">
+                    <i class="fa-solid fa-print"></i> Print Official Statement
+                </button>
+            </div>
         </div>
-        <div id="step-2" class="flex items-center gap-2 text-gray-600">
-          <i class="fa-regular fa-circle"></i>
-          <span>Verifying credentials...</span>
-        </div>
-        <div id="step-3" class="flex items-center gap-2 text-gray-600">
-          <i class="fa-regular fa-circle"></i>
-          <span>Checking ledger route...</span>
-        </div>
-        <div id="step-4" class="flex items-center gap-2 text-gray-600">
-          <i class="fa-regular fa-circle"></i>
-          <span>Finalizing settlement...</span>
-        </div>
-      </div>
     </div>
-  </div>
 
+    <!-- ========================================== -->
+    <!-- MODAL 4: ACCOUNT LINKING & GATEWAY HUB -->
+    <!-- ========================================== -->
+    <div id="modal-account-link" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+        <div class="glass-panel-glow w-full max-w-md rounded-2xl p-6 border border-slate-800 shadow-2xl relative space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-link text-sky-400 text-lg"></i>
+                    <h3 class="text-sm font-bold text-white uppercase tracking-wider">Connect Capital Account Gateway</h3>
+                </div>
+                <button onclick="closeModal('modal-account-link')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
-  <!-- ================================================================= -->
-  <!-- MODAL: DIGITAL RECEIPT GENERATOR -->
-  <!-- ================================================================= -->
-  <div id="receipt-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden overflow-y-auto">
-    <div id="receipt-modal-content" class="glass-card max-w-md w-full rounded-3xl p-6 sm:p-8 border border-gray-800 relative my-8">
-      
-      <!-- Top Status Banner -->
-      <div id="receipt-status-banner" class="text-center pb-6 border-b border-gray-800">
-        <div id="receipt-status-icon" class="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-3">
-          <!-- Populated by JS -->
-        </div>
-        <h3 id="receipt-status-title" class="text-xl font-extrabold text-white">Transaction Success</h3>
-        <p id="receipt-status-subtitle" class="text-xs text-gray-400 mt-1">Settlement confirmed on simulated ledger</p>
-      </div>
+            <div class="space-y-3">
+                <label class="block text-xs font-semibold text-slate-400">Select Enterprise Clearing Gateway Provider</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" onclick="selectGatewayProvider('Plaid Enterprise')" class="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500 text-left transition-all group">
+                        <i class="fa-solid fa-building text-sky-400 mb-1 block text-lg"></i>
+                        <span class="text-xs font-bold text-slate-200 block">Plaid Enterprise</span>
+                        <span class="text-[10px] text-slate-500">Direct Bank OAuth</span>
+                    </button>
+                    <button type="button" onclick="selectGatewayProvider('SWIFT Alliance')" class="p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500 text-left transition-all group">
+                        <i class="fa-solid fa-globe text-indigo-400 mb-1 block text-lg"></i>
+                        <span class="text-xs font-bold text-slate-200 block">SWIFT Alliance</span>
+                        <span class="text-[10px] text-slate-500">Global Direct Gateway</span>
+                    </button>
+                </div>
 
-      <!-- Receipt Data Breakdown -->
-      <div class="py-6 space-y-3 font-mono text-xs">
-        <div class="flex justify-between text-gray-400">
-          <span>Transaction ID:</span>
-          <span id="rcpt-id" class="text-white font-bold">#TX-9482910</span>
-        </div>
-        <div class="flex justify-between text-gray-400">
-          <span>Date & Time:</span>
-          <span id="rcpt-date" class="text-gray-200">2026-10-23 14:48:10</span>
-        </div>
-        <div class="flex justify-between text-gray-400">
-          <span>Transfer Mode:</span>
-          <span id="rcpt-mode" class="text-indigo-400 font-semibold">Debit (Send)</span>
-        </div>
-        <div class="flex justify-between text-gray-400">
-          <span>Counterparty:</span>
-          <span id="rcpt-name" class="text-white">Alexander Hamilton</span>
-        </div>
-        <div class="flex justify-between text-gray-400">
-          <span>Target Institution:</span>
-          <span id="rcpt-bank" class="text-white">J.P. Morgan Chase</span>
-        </div>
-        <div class="flex justify-between text-gray-400">
-          <span>Account/Card:</span>
-          <span id="rcpt-account" class="text-gray-300">•••• 8892</span>
-        </div>
+                <div class="space-y-3 pt-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Institution Routing Number / BIC</label>
+                        <input type="text" id="link-routing" placeholder="021000021 or CHASUS33XXX" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Corporate Account Number</label>
+                        <input type="text" id="link-account" placeholder="890128491029" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
 
-        <div class="border-t border-dashed border-gray-800 my-3 pt-3 flex justify-between items-center text-sm">
-          <span class="text-gray-300 font-sans font-bold">Total Amount:</span>
-          <span id="rcpt-amount" class="text-lg font-bold text-emerald-400">$1,250.00 USD</span>
+                <button onclick="executeAccountLinking()" class="w-full py-3 bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs rounded-xl transition-all shadow-lg shadow-sky-600/25 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Verify & Link Sovereign Account</span>
+                </button>
+            </div>
         </div>
-
-        <!-- Failure Reason (If Failed) -->
-        <div id="rcpt-failure-container" class="hidden p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-xs mt-3">
-          <strong class="block mb-0.5">Failure Reason:</strong>
-          <span id="rcpt-failure-reason">Simulated insufficient liquidity / Network timeout.</span>
-        </div>
-      </div>
-
-      <!-- Post-Transaction Options -->
-      <div class="pt-4 border-t border-gray-800 space-y-2.5 no-print">
-        <button 
-          onclick="printReceipt()" 
-          class="w-full py-2.5 px-4 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center justify-center gap-2"
-        >
-          <i class="fa-solid fa-print"></i>
-          <span>Print / Save Receipt PDF</span>
-        </button>
-
-        <div class="grid grid-cols-2 gap-2">
-          <button 
-            onclick="closeReceiptAndNewTx()" 
-            class="py-2.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl text-xs transition-all"
-          >
-            Send Another
-          </button>
-          <button 
-            onclick="closeReceiptToOverview()" 
-            class="py-2.5 px-3 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-xl text-xs transition-all"
-          >
-            View Dashboard
-          </button>
-        </div>
-      </div>
-
     </div>
-  </div>
 
+    <!-- MAIN JAVASCRIPT APPLICATION LOGIC -->
+    <script>
+        // System State
+        let currentVault = 'USD';
+        let chartInstance = null;
 
-  <!-- ================================================================= -->
-  <!-- JAVASCRIPT APPLICATION LOGIC -->
-  <!-- ================================================================= -->
-  <script>
-    // System Database State (Simulated)
-    const validEmails = ['user@bank.com', 'admin@sim.com', 'client@finance.org'];
-    
-    let appState = {
-      currentUser: null,
-      totalBalance: 24850.00,
-      activeCardBalance: 12400.00,
-      currentTxMode: 'debit', // debit or credit
-      connectType: 'bank',    // bank or crypto
-      transactions: [
-        {
-          id: 'TX-8839201',
-          name: 'Sarah Jenkins',
-          bank: 'Citibank N.A.',
-          date: '2026-10-22 11:20:00',
-          type: 'Debit',
-          amount: 450.00,
-          status: 'Success'
-        },
-        {
-          id: 'TX-7719204',
-          name: 'Global Tech Corp',
-          bank: 'Barclays International',
-          date: '2026-10-21 16:45:12',
-          type: 'Credit',
-          amount: 3200.00,
-          status: 'Success'
-        }
-      ],
-      linkedAccounts: [
-        { name: 'Chase Institutional', details: '•••• 8842 (US)', balance: '$12,450' }
-      ]
-    };
-
-    // Initialize Application
-    window.onload = function() {
-      renderHistoryTable();
-    };
-
-    // Helper: Fill Demo Email into input
-    function fillDemoEmail(email) {
-      document.getElementById('auth-email').value = email;
-    }
-
-    // Auth Submission
-    function handleAuthSubmit(event) {
-      event.preventDefault();
-      const emailInput = document.getElementById('auth-email').value.trim();
-
-      // Check if email format is valid
-      if (!emailInput || !emailInput.includes('@')) {
-        showToast('Please enter a valid email address.', 'error');
-        return;
-      }
-
-      appState.currentUser = emailInput;
-      document.getElementById('user-display-email').innerText = emailInput;
-
-      // Animate transition out of auth, into dashboard
-      const authScreen = document.getElementById('auth-screen');
-      const mainInterface = document.getElementById('main-interface');
-
-      authScreen.classList.add('transition-all', 'duration-500', 'opacity-0', 'scale-95');
-      
-      setTimeout(() => {
-        authScreen.classList.add('hidden');
-        mainInterface.classList.remove('hidden');
-        mainInterface.classList.add('animate-fade-in');
-        showToast(`Welcome back, ${emailInput.split('@')[0]}!`, 'success');
-      }, 400);
-    }
-
-    // Logout
-    function logout() {
-      appState.currentUser = null;
-      document.getElementById('auth-form').reset();
-      
-      const authScreen = document.getElementById('auth-screen');
-      const mainInterface = document.getElementById('main-interface');
-
-      mainInterface.classList.add('hidden');
-      authScreen.classList.remove('hidden', 'opacity-0', 'scale-95');
-      showToast('Logged out successfully.', 'info');
-    }
-
-    // Tab Switcher Logic
-    function switchTab(tabName) {
-      const tabs = ['overview', 'transaction', 'connect'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-${t}`);
-        const content = document.getElementById(`content-${t}`);
-        
-        if (t === tabName) {
-          btn.className = "px-4 py-2.5 text-sm font-semibold rounded-xl transition-all flex items-center gap-2 text-white bg-indigo-600/30 border border-indigo-500/40 shadow-md";
-          content.classList.remove('hidden');
-        } else {
-          btn.className = "px-4 py-2.5 text-sm font-semibold rounded-xl text-gray-400 hover:text-white hover:bg-gray-800/60 border border-transparent transition-all flex items-center gap-2";
-          content.classList.add('hidden');
-        }
-      });
-    }
-
-    // Transaction Mode Switcher
-    function setTransactionMode(mode) {
-      appState.currentTxMode = mode;
-      const debitBtn = document.getElementById('mode-debit');
-      const creditBtn = document.getElementById('mode-credit');
-
-      if (mode === 'debit') {
-        debitBtn.className = "py-3 px-4 rounded-xl border font-medium text-xs flex items-center justify-center gap-2 transition-all bg-indigo-600/30 border-indigo-500 text-white shadow-md shadow-indigo-500/10";
-        creditBtn.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/60 text-gray-400 font-medium text-xs flex items-center justify-center gap-2 transition-all hover:border-gray-700";
-      } else {
-        creditBtn.className = "py-3 px-4 rounded-xl border font-medium text-xs flex items-center justify-center gap-2 transition-all bg-emerald-600/30 border-emerald-500 text-white shadow-md shadow-emerald-500/10";
-        debitBtn.className = "py-3 px-4 rounded-xl border border-gray-800 bg-gray-900/60 text-gray-400 font-medium text-xs flex items-center justify-center gap-2 transition-all hover:border-gray-700";
-      }
-    }
-
-    // Connect Account Type Switcher
-    function setConnectType(type) {
-      appState.connectType = type;
-      const bankBtn = document.getElementById('connect-type-bank');
-      const cryptoBtn = document.getElementById('connect-type-crypto');
-      const bankFields = document.getElementById('bank-fields');
-      const cryptoFields = document.getElementById('crypto-fields');
-
-      if (type === 'bank') {
-        bankBtn.className = "pb-3 px-4 text-xs font-semibold border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-2";
-        cryptoBtn.className = "pb-3 px-4 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2";
-        bankFields.classList.remove('hidden');
-        cryptoFields.classList.add('hidden');
-      } else {
-        cryptoBtn.className = "pb-3 px-4 text-xs font-semibold border-b-2 border-cyan-500 text-cyan-400 flex items-center gap-2";
-        bankBtn.className = "pb-3 px-4 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-white flex items-center gap-2";
-        cryptoFields.classList.remove('hidden');
-        bankFields.classList.add('hidden');
-      }
-    }
-
-    // Form Formatters
-    function formatCardNumber(input) {
-      let v = input.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
-      let matches = v.match(/\d{4,16}/g);
-      let match = matches && matches[0] || '';
-      let parts = [];
-      for (let i = 0, len = match.length; i < len; i += 4) {
-        parts.push(match.substring(i, i + 4));
-      }
-      if (parts.length) {
-        input.value = parts.join(' ');
-      } else {
-        input.value = v;
-      }
-    }
-
-    function formatExpiry(input) {
-      let v = input.value.replace(/\s+/g, '').replace(/[^0-9]/g, '');
-      if (v.length >= 2) {
-        input.value = v.substring(0, 2) + '/' + v.substring(2, 4);
-      } else {
-        input.value = v;
-      }
-    }
-
-    // Submit Transaction Simulation
-    function handleTransactionSubmit(e) {
-      e.preventDefault();
-
-      const firstName = document.getElementById('tx-first-name').value.trim();
-      const middleName = document.getElementById('tx-middle-name').value.trim();
-      const lastName = document.getElementById('tx-last-name').value.trim();
-      const bankName = document.getElementById('tx-bank-name').value.trim();
-      const amount = parseFloat(document.getElementById('tx-amount').value);
-      const cardNumber = document.getElementById('tx-card-number').value.trim();
-      const outcome = document.querySelector('input[name="sim-outcome"]:checked').value;
-
-      const fullName = `${firstName} ${middleName ? middleName + ' ' : ''}${lastName}`;
-
-      // Open processing animation modal
-      showProcessingModal(function() {
-        // Callback after multi-step loading finishes
-        const isSuccess = outcome === 'success';
-        const txId = 'TX-' + Math.floor(1000000 + Math.random() * 9000000);
-        const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
-
-        if (isSuccess) {
-          // Adjust state balance
-          if (appState.currentTxMode === 'debit') {
-            appState.totalBalance -= amount;
-            appState.activeCardBalance -= amount;
-          } else {
-            appState.totalBalance += amount;
-            appState.activeCardBalance += amount;
-          }
-          updateBalanceDisplays();
-          confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-        }
-
-        // Record transaction
-        const txData = {
-          id: txId,
-          name: fullName,
-          bank: bankName,
-          cardNumber: cardNumber,
-          date: now,
-          type: appState.currentTxMode === 'debit' ? 'Debit' : 'Credit',
-          amount: amount,
-          status: isSuccess ? 'Success' : 'Failed'
+        // Vault Balances Dictionary
+        const vaultBalances = {
+            USD: { total: '$48,920,410.50', title: 'USD PRIMARY VAULT', symbol: '$' },
+            EUR: { total: '€12,180,000.00', title: 'EUR CLEARING VAULT', symbol: '€' },
+            GBP: { total: '£4,820,100.00', title: 'GBP CHAPS TREASURY', symbol: '£' },
+            BTC: { total: '142.50 BTC ($13.5M)', title: 'CRYPTO COLD VAULT', symbol: '₿' }
         };
 
-        appState.transactions.unshift(txData);
-        renderHistoryTable();
+        // Initialize Live Clock and Charts on Window Load
+        window.onload = function() {
+            startLiveClock();
+            initAnalyticsChart();
+        };
 
-        // Render receipt modal
-        openReceiptModal(txData, isSuccess);
-      });
-    }
+        // Real-Time UTC Clock
+        function startLiveClock() {
+            setInterval(() => {
+                const now = new Date();
+                const utcString = 'UTC ' + now.toUTCString().split(' ')[4];
+                document.getElementById('live-utc-clock').innerText = utcString;
+            }, 1000);
+        }
 
-    // Step-by-Step Processing Modal Animation
-    function showProcessingModal(onComplete) {
-      const modal = document.getElementById('processing-modal');
-      const step1 = document.getElementById('step-1');
-      const step2 = document.getElementById('step-2');
-      const step3 = document.getElementById('step-3');
-      const step4 = document.getElementById('step-4');
+        // Handle Enterprise Login
+        function handleAuthentication(e) {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            document.getElementById('user-display-email').innerText = email;
 
-      // Reset steps visual state
-      step1.className = "flex items-center gap-2 text-indigo-400";
-      step1.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i><span>Encrypting payload...</span>`;
-      
-      step2.className = "flex items-center gap-2 text-gray-600";
-      step2.innerHTML = `<i class="fa-regular fa-circle"></i><span>Verifying credentials...</span>`;
+            // Transition UI
+            document.getElementById('auth-portal').classList.add('hidden');
+            document.getElementById('treasury-portal').classList.remove('hidden');
+        }
 
-      step3.className = "flex items-center gap-2 text-gray-600";
-      step3.innerHTML = `<i class="fa-regular fa-circle"></i><span>Checking ledger route...</span>`;
+        // Vault Matrix Switching Logic
+        function switchVault(vaultKey) {
+            currentVault = vaultKey;
+            
+            // Highlight Buttons
+            ['USD', 'EUR', 'GBP', 'BTC'].forEach(k => {
+                const btn = document.getElementById(`vault-btn-${k}`);
+                if (btn) {
+                    if (k === vaultKey) {
+                        btn.className = "px-3 py-1 rounded-md text-xs font-semibold bg-sky-600 text-white transition-all";
+                    } else {
+                        btn.className = "px-3 py-1 rounded-md text-xs font-semibold text-slate-400 hover:text-white transition-all";
+                    }
+                }
+            });
 
-      step4.className = "flex items-center gap-2 text-gray-600";
-      step4.innerHTML = `<i class="fa-regular fa-circle"></i><span>Finalizing settlement...</span>`;
+            // Update Header/Metrics Display
+            document.getElementById('active-vault-title').innerText = vaultBalances[vaultKey].title;
+            document.getElementById('metric-total-balance').innerText = vaultBalances[vaultKey].total;
 
-      modal.classList.remove('hidden');
+            // Refresh Chart Data dynamically
+            updateChartData();
+        }
 
-      // Timed animations
-      setTimeout(() => {
-        step1.className = "flex items-center gap-2 text-emerald-400";
-        step1.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>Payload Encrypted</span>`;
-        step2.className = "flex items-center gap-2 text-indigo-400";
-        step2.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i><span>Verifying credentials...</span>`;
-      }, 700);
+        // Modal Utility Helpers
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
 
-      setTimeout(() => {
-        step2.className = "flex items-center gap-2 text-emerald-400";
-        step2.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>Credentials Verified</span>`;
-        step3.className = "flex items-center gap-2 text-indigo-400";
-        step3.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i><span>Checking ledger route...</span>`;
-      }, 1400);
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
 
-      setTimeout(() => {
-        step3.className = "flex items-center gap-2 text-emerald-400";
-        step3.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>Route Cleared</span>`;
-        step4.className = "flex items-center gap-2 text-indigo-400";
-        step4.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i><span>Finalizing settlement...</span>`;
-      }, 2100);
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notif-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
 
-      setTimeout(() => {
-        modal.classList.add('hidden');
-        onComplete();
-      }, 2800);
-    }
+        function toggleCardFields(checkbox) {
+            const container = document.getElementById('card-fields-container');
+            if (checkbox.checked) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
 
-    // Open Digital Receipt Modal
-    function openReceiptModal(tx, isSuccess) {
-      const modal = document.getElementById('receipt-modal');
-      const statusIcon = document.getElementById('receipt-status-icon');
-      const statusTitle = document.getElementById('receipt-status-title');
-      const statusSub = document.getElementById('receipt-status-subtitle');
-      const failureBox = document.getElementById('rcpt-failure-container');
+        // Execute Settlement Wire Sequence
+        function executeSettlementSequence(e) {
+            e.preventDefault();
+            
+            const beneficiary = document.getElementById('wire-beneficiary-name').value;
+            const amountVal = parseFloat(document.getElementById('wire-amount').value).toLocaleString('en-US', { minimumFractionDigits: 2 });
+            const rail = document.getElementById('wire-rail').value;
+            const sourceCurrency = document.getElementById('wire-source-vault').value;
+            const formattedAmount = `${vaultBalances[sourceCurrency].symbol}${amountVal} ${sourceCurrency}`;
 
-      document.getElementById('rcpt-id').innerText = '#' + tx.id;
-      document.getElementById('rcpt-date').innerText = tx.date;
-      document.getElementById('rcpt-mode').innerText = `${tx.type} Transfer`;
-      document.getElementById('rcpt-name').innerText = tx.name;
-      document.getElementById('rcpt-bank').innerText = tx.bank;
-      document.getElementById('rcpt-account').innerText = tx.cardNumber ? '•••• ' + tx.cardNumber.slice(-4) : '•••• 9182';
-      document.getElementById('rcpt-amount').innerText = `$${tx.amount.toLocaleString('en-US', {minimumFractionDigits: 2})} USD`;
+            closeModal('modal-settlement');
+            openModal('modal-processing');
 
-      if (isSuccess) {
-        statusIcon.className = "w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-3 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-        statusIcon.innerHTML = `<i class="fa-solid fa-check"></i>`;
-        statusTitle.innerText = "Transaction Succeeded";
-        statusTitle.className = "text-xl font-extrabold text-white";
-        statusSub.innerText = "Settlement confirmed on simulated ledger.";
-        failureBox.classList.add('hidden');
-      } else {
-        statusIcon.className = "w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-3 bg-red-500/20 text-red-400 border border-red-500/30";
-        statusIcon.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
-        statusTitle.innerText = "Transaction Failed";
-        statusTitle.className = "text-xl font-extrabold text-red-400";
-        statusSub.innerText = "The simulated settlement could not be executed.";
-        failureBox.classList.remove('hidden');
-      }
+            // Animated Stepper Simulation Steps
+            const steps = [
+                "Connecting to Interbank Clearing Gateway Node...",
+                "Executing ISO 17442 LEI Compliance Verification...",
+                "Running Automated Zero-Knowledge Ledger Reconciliation...",
+                "Broadcasting Cryptographic Proof to Clearinghouse...",
+                "Settlement Complete - Generating Immutable Audit Record"
+            ];
 
-      modal.classList.remove('hidden');
-    }
+            let stepIdx = 0;
+            const progressBar = document.getElementById('processing-bar');
+            const stepText = document.getElementById('processing-step-text');
+            const generatedUETR = 'UETR-' + Math.floor(100000 + Math.random() * 900000) + '-APEX-2026';
+            document.getElementById('proc-uetr').innerText = generatedUETR;
 
-    function closeReceiptAndNewTx() {
-      document.getElementById('receipt-modal').classList.add('hidden');
-      document.getElementById('transaction-form').reset();
-      switchTab('transaction');
-    }
+            const interval = setInterval(() => {
+                stepIdx++;
+                progressBar.style.width = `${(stepIdx / steps.length) * 100}%`;
+                
+                if (stepIdx < steps.length) {
+                    stepText.innerText = steps[stepIdx];
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        closeModal('modal-processing');
+                        // Append to Ledger
+                        appendTransactionToLedger(generatedUETR, beneficiary, formattedAmount, rail);
+                        // Open Receipt
+                        viewReceipt(generatedUETR, beneficiary, formattedAmount, rail, "Direct Wire Transfer");
+                    }, 600);
+                }
+            }, 700);
+        }
 
-    function closeReceiptToOverview() {
-      document.getElementById('receipt-modal').classList.add('hidden');
-      document.getElementById('transaction-form').reset();
-      switchTab('overview');
-    }
+        // Add New Transaction Record dynamically to Table
+        function appendTransactionToLedger(uetr, beneficiary, amount, rail) {
+            const tbody = document.getElementById('ledger-tbody');
+            const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
-    function printReceipt() {
-      window.print();
-    }
+            const row = document.createElement('tr');
+            row.className = "hover:bg-slate-900/50 transition-all";
+            row.innerHTML = `
+                <td class="py-3.5 px-4 text-slate-400">${now}</td>
+                <td class="py-3.5 px-4 text-slate-200 font-bold">${uetr}</td>
+                <td class="py-3.5 px-4">
+                    <div class="text-slate-200 font-sans font-semibold">${beneficiary}</div>
+                    <div class="text-[10px] text-slate-500">LEI: 549300V310492819</div>
+                </td>
+                <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800 text-[10px]">${rail}</span></td>
+                <td class="py-3.5 px-4 text-right font-bold text-rose-400">-${amount}</td>
+                <td class="py-3.5 px-4 text-center"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px]">FINALIZED</span></td>
+                <td class="py-3.5 px-4 text-center">
+                    <button onclick="viewReceipt('${uetr}', '${beneficiary}', '-${amount}', '${rail}', 'Direct Settlement')" class="text-sky-400 hover:text-sky-300 underline text-[11px]">Receipt</button>
+                </td>
+            `;
 
-    // Connect Account Submission
-    function handleConnectSubmit(e) {
-      e.preventDefault();
-      
-      let sourceName = "";
-      let details = "";
+            tbody.insertBefore(row, tbody.firstChild);
+        }
 
-      if (appState.connectType === 'bank') {
-        const country = document.getElementById('conn-country').value;
-        const bank = document.getElementById('conn-bank-name').value || 'Global Bank';
-        const acc = document.getElementById('conn-account-num').value || '9920192';
-        sourceName = bank;
-        details = `•••• ${acc.slice(-4)} (${country})`;
-      } else {
-        const net = document.getElementById('conn-crypto-net').value;
-        const addr = document.getElementById('conn-wallet-address').value || '0x71...882A';
-        sourceName = net;
-        details = `${addr.slice(0,6)}...${addr.slice(-4)}`;
-      }
+        // View Modal Receipt
+        function viewReceipt(uetr, beneficiary, amount, rail, type) {
+            document.getElementById('receipt-uetr').innerText = uetr;
+            document.getElementById('receipt-beneficiary').innerText = beneficiary;
+            document.getElementById('receipt-amount').innerText = amount;
+            document.getElementById('receipt-rail').innerText = rail;
+            document.getElementById('receipt-type').innerText = type;
+            document.getElementById('receipt-timestamp').innerText = new Date().toUTCString();
 
-      showToast('Connecting gateway...', 'info');
+            openModal('modal-receipt');
+        }
 
-      setTimeout(() => {
-        appState.linkedAccounts.push({
-          name: sourceName,
-          details: details,
-          balance: '$' + (Math.floor(Math.random() * 8000) + 1000).toLocaleString()
-        });
+        // Download Receipt Text File
+        function downloadReceiptText() {
+            const uetr = document.getElementById('receipt-uetr').innerText;
+            const content = `=================================================\nAPEX HORIZON GLOBAL TREASURY AUDIT RECEIPT\n=================================================\nUETR Ref: ${uetr}\nTimestamp: ${new Date().toISOString()}\nStatus: CRYPTOGRAPHICALLY SETTLED & FINALIZED\n=================================================\n`;
+            
+            const element = document.createElement('a');
+            const file = new Blob([content], {type: 'text/plain'});
+            element.href = URL.createObjectURL(file);
+            element.download = `Audit_Receipt_${uetr}.txt`;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
 
-        renderLinkedAccounts();
-        document.getElementById('connect-form').reset();
-        showToast('Source connected successfully!', 'success');
-        switchTab('overview');
-      }, 1200);
-    }
+        // Link Gateway Mock Function
+        function selectGatewayProvider(name) {
+            alert(`Selected ${name} Enterprise Direct Integration Bridge.`);
+        }
 
-    // Render Linked Accounts UI
-    function renderLinkedAccounts() {
-      const container = document.getElementById('linked-accounts-list');
-      const badge = document.getElementById('linked-count-badge');
-      
-      badge.innerText = `${appState.linkedAccounts.length} Active`;
+        function executeAccountLinking() {
+            closeModal('modal-account-link');
+            alert('Enterprise Capital Account Successfully Linked & Encrypted via HSM Handshake.');
+        }
 
-      container.innerHTML = appState.linkedAccounts.map(acc => `
-        <div class="flex items-center justify-between p-2.5 bg-gray-900/60 rounded-xl border border-gray-800">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
-              <i class="fa-solid fa-building-columns"></i>
-            </div>
-            <div>
-              <div class="text-xs font-semibold text-white">${acc.name}</div>
-              <div class="text-[10px] text-gray-400 font-mono">${acc.details}</div>
-            </div>
-          </div>
-          <span class="text-xs font-mono font-semibold text-emerald-400">${acc.balance}</span>
-        </div>
-      `).join('');
-    }
+        // Ledger Search Filter
+        function filterLedger() {
+            const input = document.getElementById('ledger-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#ledger-tbody tr');
 
-    // Render History Table UI
-    function renderHistoryTable() {
-      const tbody = document.getElementById('transaction-history-body');
-      
-      if (appState.transactions.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-center py-6 text-gray-500 text-xs font-sans">
-              No simulation logs found. Execute a transaction to record activity.
-            </td>
-          </tr>
-        `;
-        return;
-      }
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
 
-      tbody.innerHTML = appState.transactions.map(tx => `
-        <tr class="hover:bg-gray-900/40 transition-all">
-          <td class="py-3 px-3">
-            <div class="font-bold text-white">${tx.id}</div>
-            <div class="text-[10px] text-indigo-400">${tx.type}</div>
-          </td>
-          <td class="py-3 px-3 font-sans">
-            <div class="text-gray-200">${tx.name}</div>
-            <div class="text-[10px] text-gray-500">${tx.bank}</div>
-          </td>
-          <td class="py-3 px-3 text-gray-400 text-[11px]">${tx.date}</td>
-          <td class="py-3 px-3 font-bold ${tx.type === 'Credit' ? 'text-emerald-400' : 'text-gray-200'}">
-            ${tx.type === 'Credit' ? '+' : '-'}$${tx.amount.toLocaleString('en-US', {minimumFractionDigits: 2})}
-          </td>
-          <td class="py-3 px-3 text-center">
-            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-sans font-semibold ${
-              tx.status === 'Success' 
-                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                : 'bg-red-500/20 text-red-400 border border-red-500/30'
-            }">
-              ${tx.status}
-            </span>
-          </td>
-          <td class="py-3 px-3 text-right">
-            <button onclick='reopenReceipt("${tx.id}")' class="p-1.5 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition-all" title="View Receipt">
-              <i class="fa-solid fa-receipt text-xs"></i>
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
+        function exportLedgerCSV() {
+            alert("Exporting Encrypted Immutable Ledger Audit CSV Records...");
+        }
 
-    function reopenReceipt(txId) {
-      const tx = appState.transactions.find(t => t.id === txId);
-      if (tx) {
-        openReceiptModal(tx, tx.status === 'Success');
-      }
-    }
+        // Chart.js Portfolio Visualizations
+        function initAnalyticsChart() {
+            const ctx = document.getElementById('analyticsChart').getContext('2d');
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(2, 132, 199, 0.4)');
+            gradient.addColorStop(1, 'rgba(2, 132, 199, 0.0)');
 
-    function clearHistory() {
-      appState.transactions = [];
-      renderHistoryTable();
-      showToast('Activity log cleared.', 'info');
-    }
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon 00:00', 'Tue 04:00', 'Wed 08:00', 'Thu 12:00', 'Fri 16:00', 'Sat 20:00', 'Sun 24:00'],
+                    datasets: [{
+                        label: 'Consolidated Capital Net Volume ($USD)',
+                        data: [42100000, 43500000, 41800000, 45200000, 46800000, 47900000, 48920410],
+                        borderColor: '#0284c7',
+                        borderWidth: 2.5,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#38bdf8',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { family: 'JetBrains Mono', size: 10 },
+                                callback: function(value) {
+                                    return '$' + (value / 1000000).toFixed(1) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
-    function updateBalanceDisplays() {
-      document.getElementById('total-balance-display').innerText = appState.totalBalance.toLocaleString('en-US', {minimumFractionDigits: 2});
-      document.getElementById('active-card-balance').innerText = appState.activeCardBalance.toLocaleString('en-US', {minimumFractionDigits: 2});
-    }
+        function updateChartRange(range) {
+            if (!chartInstance) return;
+            if (range === '7D') {
+                chartInstance.data.datasets[0].data = [42100000, 43500000, 41800000, 45200000, 46800000, 47900000, 48920410];
+            } else if (range === '1M') {
+                chartInstance.data.datasets[0].data = [35000000, 38200000, 39100000, 42000000, 44500000, 46000000, 48920410];
+            } else if (range === '1Y') {
+                chartInstance.data.datasets[0].data = [20000000, 25000000, 29000000, 34000000, 41000000, 45000000, 48920410];
+            }
+            chartInstance.update();
+        }
 
-    // Toast Utility
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      
-      let bg = 'bg-gray-900 border-gray-700 text-white';
-      let icon = 'fa-info-circle text-indigo-400';
-
-      if (type === 'success') {
-        bg = 'bg-gray-900 border-emerald-500/50 text-white';
-        icon = 'fa-check-circle text-emerald-400';
-      } else if (type === 'error') {
-        bg = 'bg-gray-900 border-red-500/50 text-white';
-        icon = 'fa-exclamation-circle text-red-400';
-      }
-
-      toast.className = `${bg} pointer-events-auto border px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 text-xs font-medium transform transition-all duration-300 translate-y-[-10px] opacity-0`;
-      toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${message}</span>`;
-
-      container.appendChild(toast);
-
-      setTimeout(() => {
-        toast.classList.remove('translate-y-[-10px]', 'opacity-0');
-      }, 10);
-
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-[-10px]');
-        setTimeout(() => toast.remove(), 300);
-      }, 3500);
-    }
-  </script>
+        function updateChartData() {
+            if (!chartInstance) return;
+            const factor = currentVault === 'EUR' ? 0.8 : (currentVault === 'GBP' ? 0.6 : (currentVault === 'BTC' ? 0.3 : 1));
+            chartInstance.data.datasets[0].data = chartInstance.data.datasets[0].data.map(val => val * factor);
+            chartInstance.update();
+        }
+    </script>
 </body>
 </html>
 ```
