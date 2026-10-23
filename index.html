@@ -1,286 +1,36 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Test Token Simulator</title>
-<style>
-:root {
-  color-scheme: dark;
-  --bg: #0a1020;
-  --panel: #121c30;
-  --border: #263651;
-  --text: #edf4ff;
-  --muted: #9eafc8;
-  --accent: #39d6b0;
-  --danger: #ff7e8a;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font: 15px/1.5 system-ui, sans-serif;
-}
-main { max-width: 980px; margin: auto; padding: 24px 16px 48px; }
-header { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-h1 { font-size: clamp(23px, 5vw, 32px); margin: 0; }
-h2 { font-size: 17px; margin-top: 0; }
-p { color: var(--muted); }
-.banner {
-  background: #392b13; border: 1px solid #856329;
-  color: #ffe2a0; border-radius: 10px; padding: 13px;
-  margin: 20px 0;
-}
-.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
-.panel {
-  background: var(--panel); border:1px solid var(--border);
-  padding:20px; border-radius:16px; min-width:0;
-}
-.balance { font-size: clamp(30px, 6vw, 42px); font-weight:750; overflow-wrap:anywhere; }
-.muted { color:var(--muted); font-size:13px; }
-input, button {
-  font:inherit; width:100%; border-radius:9px; padding:12px;
-}
-input {
-  background:#0a1427; color:var(--text);
-  border:1px solid var(--border); margin:6px 0 13px;
-}
-button {
-  cursor:pointer; border:0; background:var(--accent);
-  color:#06251e; font-weight:750;
-}
-button.secondary { background:#243650; color:var(--text); margin-top:8px; }
-button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-button:disabled { opacity:.5; cursor:not-allowed; }
-table { width:100%; border-collapse:collapse; }
-th,td { text-align:left; padding:12px 8px; border-bottom:1px solid var(--border); }
-th { color:var(--muted); font-size:12px; }
-td { overflow-wrap:anywhere; }
-.table-wrap { overflow-x:auto; }
-.tag { font-size:11px; color:#ffe2a0; }
-.notice { min-height:24px; margin:12px 0; }
-footer { margin-top:20px; color:var(--muted); font-size:12px; }
-</style>
-</head>
-<body>
-<main>
-  <header>
-    <div>
-      <div class="muted">DEVELOPER DEMO</div>
-      <h1>Test Token Wallet</h1>
-    </div>
-    <span class="tag">SIMULATION ONLY</span>
-  </header>
-
-  <div class="banner">
-    <strong>TEST TOKENS — NO REAL USDT VALUE</strong><br>
-    This website simulates token transfers. It does not connect to
-    Tether, a real wallet, or any blockchain.
-  </div>
-
-  <section class="grid">
-    <div class="panel">
-      <div class="muted">SIMULATED BALANCE</div>
-      <div class="balance"><span id="balance">1,000.00</span></div>
-      <p>TEST-USD · Not redeemable</p>
-      <button id="reset" class="secondary">Reset demo</button>
-    </div>
-
-    <div class="panel">
-      <h2>Receive test tokens</h2>
-      <p>Credit the demo wallet with sample tokens.</p>
-      <label for="receiveAmount">Amount</label>
-      <input id="receiveAmount" type="number" min="0.01"
-             max="1000000" step="0.01" value="100">
-      <button id="receive">Add test tokens</button>
-    </div>
-
-    <div class="panel">
-      <h2>Send test tokens</h2>
-      <label for="recipient">Recipient label</label>
-      <input id="recipient" maxlength="60"
-             placeholder="e.g. Demo Wallet B">
-      <label for="sendAmount">Amount</label>
-      <input id="sendAmount" type="number" min="0.01"
-             max="1000000" step="0.01" placeholder="25.00">
-      <button id="send">Simulate transfer</button>
-    </div>
-  </section>
-
-  <div id="message" class="notice" role="status" aria-live="polite"></div>
-
-  <section class="panel">
-    <h2>Transaction history</h2>
-    <p class="muted">All entries below are local simulation records,
-       not blockchain transactions.</p>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Reference</th><th>Type</th><th>Amount</th>
-              <th>Details</th><th>Status</th></tr>
-        </thead>
-        <tbody id="history"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <footer>
-    TEST-USD is a fictional demo asset. No real USDT is issued,
-    transferred, deposited, or generated. Records can be edited
-    or cleared by the browser user.
-  </footer>
-</main>
+<!-- frontend/checkout.html -->
+<script src="https://js.stripe.com/v3/"></script>
+<form id="payment-form">
+  <div id="card-element"></div>
+  <button id="submit-btn" disabled>Pay ${{ amount }}</button>
+  <div id="error-message" role="alert"></div>
+</form>
 
 <script>
-(() => {
-  "use strict";
+const stripe = Stripe('pk_live_YOUR_PUBLISHABLE_KEY');
+const elements = stripe.elements();
+const card = elements.create('card', {style: {base: {fontSize: '16px'}}});
+card.mount('#card-element');
 
-  const STORAGE_KEY = "test-token-simulator-v1";
-  const START_BALANCE = 100000; // cents = 1,000.00
-  const MAX_CENTS = 100000000;  // 1,000,000.00
+card.on('change', e => {
+  document.getElementById('submit-btn').disabled = !e.complete;
+  document.getElementById('error-message').textContent = e.error?.message || '';
+});
 
-  const $ = id => document.getElementById(id);
-  let state;
+document.getElementById('payment-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const {error, paymentMethod} = await stripe.createPaymentMethod('card', card);
+  if (error) return showError(error.message);
 
-  function initialState() {
-    return { balance: START_BALANCE, transactions: [] };
-  }
-
-  function load() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (saved &&
-          Number.isSafeInteger(saved.balance) &&
-          saved.balance >= 0 &&
-          saved.balance <= MAX_CENTS &&
-          Array.isArray(saved.transactions)) {
-        return saved;
-      }
-    } catch (_) {}
-    return initialState();
-  }
-
-  function save() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (_) {
-      show("Browser storage is unavailable. Changes may not persist.", true);
-    }
-  }
-
-  function money(cents) {
-    return (cents / 100).toLocaleString("en-US", {
-      minimumFractionDigits: 2, maximumFractionDigits: 2
-    });
-  }
-
-  function show(text, error = false) {
-    $("message").textContent = text;
-    $("message").style.color = error ? "var(--danger)" : "var(--accent)";
-  }
-
-  function parseAmount(value) {
-    if (!/^\d{1,7}(\.\d{1,2})?$/.test(value.trim())) return null;
-    const amount = Number(value);
-    if (!Number.isFinite(amount) || amount <= 0 || amount > 1000000)
-      return null;
-    const cents = Math.round(amount * 100);
-    return Number.isSafeInteger(cents) && cents > 0 ? cents : null;
-  }
-
-  function reference() {
-    // Demo identifier only; not a blockchain transaction hash.
-    return "DEMO-" + Date.now().toString(36).toUpperCase()
-      + "-" + Math.random().toString(36).slice(2, 7).toUpperCase();
-  }
-
-  function addTransaction(type, cents, details) {
-    state.transactions.unshift({
-      ref: reference(),
-      type,
-      cents,
-      details,
-      status: "SIMULATED",
-      time: new Date().toISOString()
-    });
-    state.transactions = state.transactions.slice(0, 100);
-  }
-
-  function render() {
-    $("balance").textContent = money(state.balance);
-    const tbody = $("history");
-    tbody.replaceChildren();
-
-    if (!state.transactions.length) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 5;
-      td.textContent = "No simulated transactions yet.";
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-      return;
-    }
-
-    for (const tx of state.transactions) {
-      const tr = document.createElement("tr");
-      const values = [
-        tx.ref, tx.type,
-        (tx.type === "SEND" ? "−" : "+") + money(tx.cents),
-        tx.details,
-        "SIMULATED"
-      ];
-      for (const value of values) {
-        const td = document.createElement("td");
-        // Text only: user input cannot inject HTML.
-        td.textContent = value;
-        tr.appendChild(td);
-      }
-      tbody.appendChild(tr);
-    }
-  }
-
-  $("receive").addEventListener("click", () => {
-    const cents = parseAmount($("receiveAmount").value);
-    if (cents === null) return show("Enter a valid amount up to 1,000,000.00.", true);
-    if (state.balance + cents > MAX_CENTS)
-      return show("That would exceed the demo balance limit.", true);
-
-    state.balance += cents;
-    addTransaction("RECEIVE", cents, "Demo credit");
-    save();
-    render();
-    show("Test tokens added. No blockchain transaction occurred.");
+  const res = await fetch('/api/payment-intent', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({amount: 5000, currency: 'usd', payment_method_id: paymentMethod.id})
   });
-
-  $("send").addEventListener("click", () => {
-    const recipient = $("recipient").value.trim();
-    const cents = parseAmount($("sendAmount").value);
-
-    if (!recipient) return show("Enter a recipient label.", true);
-    if (cents === null) return show("Enter a valid amount up to 1,000,000.00.", true);
-    if (cents > state.balance) return show("Insufficient simulated balance.", true);
-
-    state.balance -= cents;
-    addTransaction("SEND", cents, "To: " + recipient);
-    save();
-    render();
-    $("sendAmount").value = "";
-    show("Transfer simulated successfully. Nothing was sent on-chain.");
-  });
-
-  $("reset").addEventListener("click", () => {
-    if (!confirm("Reset the demo balance and erase local demo history?")) return;
-    state = initialState();
-    save();
-    render();
-    show("Demo reset. No real assets were affected.");
-  });
-
-  state = load();
-  render();
-})();
+  const data = await res.json();
+  if (data.clien Handle next_action (3DS redirect) or success
+  } else {
+    showError(data.error);
+  }
+});
 </script>
-</body>
-</html>
