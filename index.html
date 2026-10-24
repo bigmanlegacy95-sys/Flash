@@ -20,6 +20,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root {
             --bg-base: #060911;
@@ -555,7 +558,7 @@
                         <input type="file" id="payment-screenshot" accept="image/*" class="form-input" required>
                     </div>
 
-                    <button type="submit" class="btn-primary">
+                    <button type="submit" class="btn-primary" id="submit-btn">
                         <span>Submit Credentials & Verification</span>
                     </button>
                 </form>
@@ -606,15 +609,14 @@
                     <div class="table-wrapper">
                         <table>
                             <thead>
-                                table
-                                    <tr>
-                                        <th>Transaction UETR</th>
-                                        <th>Timestamp (UTC)</th>
-                                        <th>Counterparty</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
+                                <tr>
+                                    <th>Transaction UETR</th>
+                                    <th>Timestamp (UTC)</th>
+                                    <th>Counterparty</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
                             </thead>
                             <tbody id="ledger-rows">
                                 <tr>
@@ -675,6 +677,11 @@
 
     <!-- Application Controller Logic -->
     <script>
+        // Supabase Credentials Initialization
+        const SUPABASE_URL = 'https://gtjwxxxbhbxpzqwfbumq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_5c_4hOqIU_-mblQ_VkSwtg_BMTwll-H';
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
         // Inline Service Worker Generation via Blob Data URL
         if ('serviceWorker' in navigator) {
             const swCode = `
@@ -721,17 +728,38 @@
             });
         });
 
-        // Gateway Authentication Flow
+        // Gateway Authentication Flow with Supabase Magic Link
         const gatewayForm = document.getElementById('gateway-form');
         const authView = document.getElementById('auth-view');
         const dashboardView = document.getElementById('dashboard-view');
         const sessionBadge = document.getElementById('session-badge');
 
-        gatewayForm.addEventListener('submit', (e) => {
+        gatewayForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const userEmail = document.getElementById('user-email').value;
+            const submitBtn = document.getElementById('submit-btn');
             
             if (userEmail) {
+                if (supabase) {
+                    try {
+                        submitBtn.innerText = 'Authenticating with Supabase...';
+                        const { data, error } = await supabase.auth.signInWithOtp({
+                            email: userEmail
+                        });
+
+                        if (error) {
+                            console.error('Supabase Auth Error:', error.message);
+                            alert('Supabase Auth Error: ' + error.message);
+                        } else {
+                            alert('Authorization email link sent! Check your inbox.');
+                        }
+                    } catch (err) {
+                        console.error('Unexpected Auth Error:', err);
+                    } finally {
+                        submitBtn.innerHTML = '<span>Submit Credentials & Verification</span>';
+                    }
+                }
+
                 sessionBadge.innerText = userEmail;
                 authView.classList.remove('active');
                 dashboardView.classList.add('active');
