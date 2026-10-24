@@ -593,7 +593,7 @@
                     <button type="button" class="auth-tab-btn" id="tab-signup-btn">Sign Up / Activate</button>
                 </div>
 
-                <!-- TAB 1: Existing Account Log In Form (Email Only) -->
+                <!-- TAB 1: Existing Account Log In Form -->
                 <div id="login-panel" class="tab-panel active">
                     <h1 class="auth-title">Portal Member Sign In</h1>
                     <p class="auth-subtitle">Enter your activated corporate email to access your sovereign vault.</p>
@@ -771,7 +771,7 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_5c_4hOqIU_-mblQ_VkSwtg_BMTwll-H';
         const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        // Tab Switching Logic (Log In vs Sign Up)
+        // Tab Switching Logic
         const tabLoginBtn = document.getElementById('tab-login-btn');
         const tabSignupBtn = document.getElementById('tab-signup-btn');
         const loginPanel = document.getElementById('login-panel');
@@ -794,42 +794,6 @@
         tabLoginBtn.addEventListener('click', () => switchAuthTab('login'));
         tabSignupBtn.addEventListener('click', () => switchAuthTab('signup'));
 
-        // Inline Service Worker Generation via Blob Data URL
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'apex-portal-v2';
-                self.addEventListener('install', e => self.skipWaiting());
-                self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                self.addEventListener('fetch', e => {
-                    e.respondWith(fetch(e.request).catch(() => new Response('Offline Content Unavailable')));
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'text/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch(err => console.error("SW Registration Error:", err));
-        }
-
-        // PWA Install Prompt Handling
-        let deferredPrompt;
-        const pwaBtn = document.getElementById('pwa-install-btn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            pwaBtn.style.display = 'block';
-        });
-
-        pwaBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    pwaBtn.style.display = 'none';
-                }
-                deferredPrompt = null;
-            }
-        });
-
         // Copy TRC20 Wallet Address
         document.getElementById('copy-address-btn').addEventListener('click', () => {
             const address = document.getElementById('trc20-address').innerText;
@@ -845,7 +809,7 @@
         const dashboardView = document.getElementById('dashboard-view');
         const sessionBadge = document.getElementById('session-badge');
 
-        // 1. LOG IN FORM SUBMISSION (Existing authorized email check)
+        // 1. LOG IN FORM SUBMISSION
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
@@ -853,35 +817,43 @@
 
             if (!email) return;
 
-            loginBtn.innerText = 'Verifying Account...';
+            loginBtn.innerText = 'Verifying Authorization...';
+
+            let isAuthorized = false;
 
             if (supabase) {
                 try {
-                    // Send magic link login request via Supabase
-                    const { data, error } = await supabase.auth.signInWithOtp({ email });
+                    // Query Supabase table to verify if email is authorized
+                    const { data, error } = await supabase
+                        .from('authorized_emails')
+                        .select('email')
+                        .eq('email', email)
+                        .maybeSingle();
 
-                    if (error) {
-                        alert('Account not authorized or found in system. Please complete Sign Up & Activation.');
-                        switchAuthTab('signup');
-                        document.getElementById('signup-email').value = email;
-                        loginBtn.innerText = 'Log In to Dashboard';
-                        return;
+                    if (data && data.email) {
+                        isAuthorized = true;
                     }
-
-                    alert('Authorization link sent to your email! Logging in...');
                 } catch (err) {
-                    console.error('Auth verification error:', err);
+                    console.error('Supabase verification error:', err);
                 }
             }
 
-            // Successful entry into main dashboard
+            if (!isAuthorized) {
+                alert('Email not authorized in the system. Please complete Sign Up & Activation first.');
+                loginBtn.innerText = 'Log In to Dashboard';
+                document.getElementById('signup-email').value = email;
+                switchAuthTab('signup');
+                return;
+            }
+
+            // Directly let authorized user into the application
             sessionBadge.innerText = email;
             authView.classList.remove('active');
             dashboardView.classList.add('active');
             initLiquidityChart();
         });
 
-        // 2. SIGN UP FORM SUBMISSION (Payment proof + email registration)
+        // 2. SIGN UP FORM SUBMISSION
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('signup-email').value.trim();
@@ -893,23 +865,16 @@
 
             if (supabase) {
                 try {
-                    const { data, error } = await supabase.auth.signInWithOtp({
-                        email,
-                        options: { shouldCreateUser: true }
-                    });
-
-                    if (error) {
-                        alert('Sign up error: ' + error.message);
-                        signupBtn.innerText = 'Submit Credentials & Verification';
-                        return;
-                    }
-
-                    alert('Activation details & payment verification received! Check your email for login confirmation.');
+                    // Add new sign-up record to Supabase authorized table
+                    await supabase
+                        .from('authorized_emails')
+                        .insert([{ email: email, status: 'pending_payment' }]);
                 } catch (err) {
-                    console.error('Sign up error:', err);
+                    console.error('Sign up registration error:', err);
                 }
             }
 
+            alert('Activation request and payment submitted successfully!');
             sessionBadge.innerText = email;
             authView.classList.remove('active');
             dashboardView.classList.add('active');
