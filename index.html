@@ -1,155 +1,960 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DEMO Portal – Not Real</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<style>
-:root{--bg:#f4f6fb;--surface:#fff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;--accent:#2563eb;--warn:#b91c1c;--warnbg:#fee2e2;--ok:#047857}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#060911;--surface:#0d1322;--text:#f1f5f9;--muted:#94a3b8;--border:#1e293b;--accent:#3b82f6;--warn:#fecaca;--warnbg:#7f1d1d;--ok:#34d399}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#060911;--surface:#0d1322;--text:#f1f5f9;--muted:#94a3b8;--border:#1e293b;--accent:#3b82f6;--warn:#fecaca;--warnbg:#7f1d1d;--ok:#34d399}
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{background:var(--bg);color:var(--text);min-height:100vh}
-.banner{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--warnbg);color:var(--warn);text-align:center;font-size:13px;font-weight:700;padding:10px 12px}
-.wrap{max-width:720px;margin:0 auto;padding:20px 16px 60px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
-h1{font-size:22px;margin-bottom:6px}
-p.sub{color:var(--muted);font-size:14px;line-height:1.5;margin-bottom:18px}
-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
-input{width:100%;padding:13px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:15px;margin-bottom:14px}
-button{width:100%;padding:13px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer}
-button.ghost{background:transparent;color:var(--accent);border:1px solid var(--border);margin-top:10px}
-.msg{font-size:13px;margin-top:12px;min-height:18px;color:var(--muted)}
-.notice{font-size:12px;color:var(--warn);background:var(--warnbg);border-radius:8px;padding:10px 12px;margin-top:14px;font-weight:600;line-height:1.4}
-.view{display:none}.view.active{display:block}
-.bal{font-size:32px;font-weight:700;margin:8px 0}
-.tag{display:inline-block;font-size:11px;font-weight:700;color:var(--warn);background:var(--warnbg);padding:2px 8px;border-radius:6px}
-.scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
-th{font-size:12px;color:var(--muted);text-transform:uppercase}
-.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
-.row button{width:auto;padding:8px 14px}
-.foot{position:fixed;bottom:0;left:0;right:0;background:var(--warnbg);color:var(--warn);font-size:11px;font-weight:700;text-align:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apex Financial Infrastructure | Sovereign Web Portal</title>
+    
+    <!-- PWA Primary Theme Color -->
+    <meta name="theme-color" content="#090d16">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Apex Financial">
+
+    <!-- Embedded Dynamic Web App Manifest via Data URI -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Apex Financial Infrastructure","short_name":"Apex Portal","start_url":".","display":"standalone","background_color":"#090d16","theme_color":"#090d16","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" fill=\"%233b82f6\"><rect width=\"512\" height=\"512\" rx=\"100\" fill=\"%23090d16\"/><path d=\"M256 120L380 360H132L256 120Z\" fill=\"%233b82f6\"/></svg>","sizes":"192x192 512x512","type":"image/svg+xml"}]}'>
+
+    <!-- Typography & Chart Engine -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --bg-base: #060911;
+            --bg-surface: #0d1322;
+            --bg-surface-elevated: #141c30;
+            --bg-card: rgba(20, 28, 48, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(59, 130, 246, 0.3);
+            --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.25);
+            --text-main: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --status-success: #10b981;
+            --status-warning: #f59e0b;
+            --status-danger: #ef4444;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+        }
+
+        /* App Banner / Header Navigation */
+        .app-header {
+            width: 100%;
+            background: rgba(13, 19, 34, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), #1d4ed8);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px var(--accent-glow);
+        }
+
+        .brand-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .install-pwa-btn {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid var(--border-highlight);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            transition: all 0.2s ease;
+        }
+
+        .install-pwa-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .user-badge {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg-surface-elevated);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Layout Container */
+        .main-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 32px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        /* Views */
+        .view-section {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Gateway Authentication Screen */
+        .auth-wrapper {
+            max-width: 480px;
+            margin: 40px auto;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--status-success));
+        }
+
+        /* Tab Controls for Login vs Signup */
+        .auth-tabs {
+            display: flex;
+            background: var(--bg-base);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .auth-tab-btn.active {
+            background: var(--bg-surface-elevated);
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .auth-title {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px 16px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .deposit-panel {
+            background: rgba(9, 13, 22, 0.8);
+            border: 1px dashed var(--border-highlight);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .deposit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .network-tag {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--status-success);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .address-box {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-main);
+            background: var(--bg-surface);
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            word-break: break-all;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--accent-primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.99);
+        }
+
+        .auth-toggle-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .auth-toggle-link button {
+            background: none;
+            border: none;
+            color: var(--accent-primary);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Dashboard Overview */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+        }
+
+        .col-span-8 { grid-column: span 8; }
+        .col-span-4 { grid-column: span 4; }
+        .col-span-12 { grid-column: span 12; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .balance-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.03em;
+            margin: 12px 0 4px 0;
+        }
+
+        .balance-delta {
+            font-size: 13px;
+            color: var(--status-success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .actions-menu {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-secondary {
+            background: var(--bg-surface-elevated);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--border-highlight);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        /* Transaction Table */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mono {
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+
+        .badge-settled {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--status-success);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Receipt Card Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .receipt-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-highlight);
+            border-radius: 20px;
+            max-width: 480px;
+            width: 100%;
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+        }
+
+        .receipt-label {
+            color: var(--text-secondary);
+        }
+
+        .receipt-value {
+            color: var(--text-main);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            .col-span-8, .col-span-4 {
+                grid-column: span 12;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 16px;
+            }
+
+            .auth-wrapper {
+                padding: 24px 18px;
+            }
+
+            .balance-value {
+                font-size: 28px;
+            }
+
+            .actions-menu {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="banner">⚠ DEMO ONLY – THIS IS NOT REAL. NO REAL MONEY, BANKS OR ACCOUNTS.</div>
-<div class="wrap">
 
-<section id="auth" class="view active">
- <div class="card">
-  <h1>Demo Portal Sign In</h1>
-  <p class="sub">Enter your email. If it’s already registered you’ll go straight in. If not, you’ll be taken to sign up.</p>
-  <label for="email">Email</label>
-  <input id="email" type="email" placeholder="you@example.com" autocomplete="email">
-  <button id="go">Continue</button>
-  <div class="msg" id="msg"></div>
-  <div class="notice">This is a college demonstration. Nothing here is real: no real accounts, balances, transactions or payments.</div>
- </div>
-</section>
+    <!-- Header Navigation -->
+    <header class="app-header">
+        <div class="brand-logo">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 19h20L12 2zm0 3.8L18.4 17H5.6L12 5.8z"/></svg>
+            </div>
+            <span>Apex Financial</span>
+        </div>
+        <div class="header-actions">
+            <button id="pwa-install-btn" class="install-pwa-btn">Install App</button>
+            <span class="user-badge" id="session-badge">Session: Verification Required</span>
+        </div>
+    </header>
 
-<section id="signup" class="view">
- <div class="card">
-  <h1>Sign Up (Demo)</h1>
-  <p class="sub">This email isn’t registered yet. Confirm it to create a demo account. No payment is needed or accepted.</p>
-  <label for="semail">Email</label>
-  <input id="semail" type="email">
-  <button id="reg">Create Demo Account</button>
-  <button class="ghost" id="back">Back</button>
-  <div class="msg" id="smsg"></div>
-  <div class="notice">Do not send money or personal documents. This is not a real service.</div>
- </div>
-</section>
+    <!-- Main Content Area -->
+    <main class="main-container">
 
-<section id="dash" class="view">
- <div class="card">
-  <div class="row"><span class="tag">DEMO – NOT REAL</span><button id="out">Sign out</button></div>
-  <p class="sub" id="who"></p>
-  <label>Sample balance (fictional)</label>
-  <div class="bal">$1,000.00 <span class="tag">SAMPLE</span></div>
-  <div class="notice">This balance is made-up sample data. It is not real money.</div>
- </div>
- <div class="card">
-  <div class="row"><strong>Sample transactions</strong><span class="tag">NOT REAL</span></div>
-  <div class="scroll"><table>
-   <thead><tr><th>ID</th><th>Date</th><th>Counterparty</th><th>Amount</th><th></th></tr></thead>
-   <tbody id="rows"></tbody>
-  </table></div>
- </div>
-</section>
+        <!-- STEP 1: Authentication & Activation Gateway -->
+        <section id="auth-view" class="view-section active">
+            <div class="auth-wrapper">
+                
+                <!-- Toggle Tabs: Existing User vs First-Time Sign Up -->
+                <div class="auth-tabs">
+                    <button type="button" class="auth-tab-btn active" id="tab-login-btn">Log In</button>
+                    <button type="button" class="auth-tab-btn" id="tab-signup-btn">Sign Up / Activate</button>
+                </div>
 
-<section id="receipt" class="view">
- <div class="card">
-  <h1>Sample Receipt</h1>
-  <p class="sub"><span class="tag">DEMO – NOT A REAL RECEIPT</span></p>
-  <p id="rbody" style="line-height:1.8;font-size:14px"></p>
-  <div class="notice">This receipt is fictional. No transfer took place.</div>
-  <button class="ghost" id="rback">Back</button>
- </div>
-</section>
+                <!-- TAB 1: Existing Account Log In Form -->
+                <div id="login-panel" class="tab-panel active">
+                    <h1 class="auth-title">Portal Member Sign In</h1>
+                    <p class="auth-subtitle">Enter your authorized corporate email to access your sovereign vault.</p>
 
-</div>
-<div class="foot">DEMO · NOT REAL · EDUCATIONAL USE ONLY</div>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label class="form-label" for="login-email">Account Email</label>
+                            <input type="email" id="login-email" class="form-input" required placeholder="treasury@domain.com">
+                        </div>
 
-<script>
-const SUPABASE_URL='https://gtjwxxxbhbxpzqwfbumq.supabase.co';
-const SUPABASE_KEY='sb_publishable_5c_4hOqIU_-mblQ_VkSwtg_BMTwll-H';
-const db=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
-const $=id=>document.getElementById(id);
-const show=id=>{document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(id).classList.add('active');window.scrollTo(0,0)};
-const SAMPLE=[
- ['DEMO-0001','2026-10-24','Example Bank A (fictional)','$250.00'],
- ['DEMO-0002','2026-10-23','Sample Trust Ltd (fictional)','$120.00'],
- ['DEMO-0003','2026-10-22','Test Corp (fictional)','$75.50']
-];
-function renderRows(){
- $('rows').innerHTML='';
- SAMPLE.forEach(r=>{
-  const tr=document.createElement('tr');
-  r.forEach(c=>{const td=document.createElement('td');td.textContent=c;tr.appendChild(td)});
-  const td=document.createElement('td');const b=document.createElement('button');
-  b.textContent='View';b.style.width='auto';b.style.padding='6px 12px';
-  b.onclick=()=>{$('rbody').textContent='ID: '+r[0]+' · Date: '+r[1]+' · To: '+r[2]+' · Amount: '+r[3]+' · DEMO ONLY, NOT REAL';show('receipt')};
-  td.appendChild(b);tr.appendChild(td);$('rows').appendChild(tr);
- });
-}
-function enter(email){$('who').textContent='Signed in as '+email+' (demo session)';renderRows();show('dash')}
-const valid=e=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+                        <button type="submit" class="btn-primary" id="login-submit-btn">
+                            <span>Log In to Dashboard</span>
+                        </button>
+                    </form>
 
-$('go').onclick=async()=>{
- const email=$('email').value.trim().toLowerCase();
- if(!valid(email)){$('msg').textContent='Please enter a valid email.';return}
- if(!db){$('msg').textContent='Could not load the database connection. Check your internet and try again.';return}
- $('msg').textContent='Checking…';
- try{
-  const {data,error}=await db.from('authorized_emails').select('email').eq('email',email).maybeSingle();
-  if(error)throw error;
-  $('msg').textContent='';
-  if(data&&data.email){enter(email)}
-  else{$('semail').value=email;$('smsg').textContent='';show('signup')}
- }catch(err){$('msg').textContent='Database error: '+(err.message||err)}
-};
-$('reg').onclick=async()=>{
- const email=$('semail').value.trim().toLowerCase();
- if(!valid(email)){$('smsg').textContent='Please enter a valid email.';return}
- $('smsg').textContent='Creating demo account…';
- try{
-  const {error}=await db.from('authorized_emails').insert([{email:email,status:'active'}]);
-  if(error)throw error;
-  enter(email);
- }catch(err){$('smsg').textContent='Could not sign up: '+(err.message||err)}
-};
-$('back').onclick=()=>show('auth');
-$('rback').onclick=()=>show('dash');
-$('out').onclick=()=>{$('email').value='';show('auth')};
-$('email').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()});
-</script>
+                    <div class="auth-toggle-link">
+                        First time here? <button type="button" onclick="switchAuthTab('signup')">Sign Up & Activate Account</button>
+                    </div>
+                </div>
+
+                <!-- TAB 2: First-Time Registration & Payment Flow -->
+                <div id="signup-panel" class="tab-panel">
+                    <h1 class="auth-title">Account Activation</h1>
+                    <p class="auth-subtitle">Provide your email and complete activation network funding proof.</p>
+
+                    <form id="signup-form">
+                        <div class="form-group">
+                            <label class="form-label" for="signup-email">Active Account Email</label>
+                            <input type="email" id="signup-email" class="form-input" required placeholder="treasury@domain.com">
+                        </div>
+
+                        <div class="deposit-panel">
+                            <div class="deposit-header">
+                                <span class="form-label" style="margin: 0;">USDT Deposit Address</span>
+                                <span class="network-tag">TRC20 Network</span>
+                            </div>
+                            <div class="address-box">
+                                <span id="trc20-address">THk4mbVVxrQ1msFrphcmCDEKXti5qEzFoq</span>
+                                <button type="button" class="copy-btn" id="copy-address-btn">Copy</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="payment-screenshot">Payment Verification Proof</label>
+                            <input type="file" id="payment-screenshot" accept="image/*" class="form-input" required>
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="signup-submit-btn">
+                            <span>Submit Credentials & Verification</span>
+                        </button>
+                    </form>
+
+                    <div class="auth-toggle-link">
+                        Already activated? <button type="button" onclick="switchAuthTab('login')">Log In Here</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- STEP 2: Primary Financial Dashboard -->
+        <section id="dashboard-view" class="view-section">
+            <div class="dashboard-grid">
+                
+                <!-- Main Liquidity Panel -->
+                <div class="card col-span-8">
+                    <div class="card-header">
+                        <span class="card-title">Corporate Vault Liquidity</span>
+                        <span class="badge-settled">Real-Time Clearing</span>
+                    </div>
+                    <div class="balance-value">$1,250,000.00 <span style="font-size: 16px; color: var(--text-secondary); font-weight: 400;">USD</span></div>
+                    <div class="balance-delta">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+                        <span>+2.4% yield settlement auto-credited</span>
+                    </div>
+
+                    <div style="height: 180px; margin-top: 24px; width: 100%;">
+                        <canvas id="liquidityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Account Actions -->
+                <div class="card col-span-4">
+                    <div class="card-header">
+                        <span class="card-title">Quick Execution</span>
+                    </div>
+                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Execute instantaneous settlement instructions across connected SWIFT GPI or FedNow liquidity corridors.</p>
+                    
+                    <div class="actions-menu">
+                        <button class="btn-secondary" id="btn-open-transfer">Initiate Wire</button>
+                        <button class="btn-secondary" id="btn-open-connect">Connect Account</button>
+                    </div>
+                </div>
+
+                <!-- Transaction Ledger -->
+                <div class="card col-span-12">
+                    <div class="card-header">
+                        <span class="card-title">Settlement Audit Trail</span>
+                        <button class="btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="location.reload()">Refresh Ledger</button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transaction UETR</th>
+                                    <th>Timestamp (UTC)</th>
+                                    <th>Counterparty</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledger-rows">
+                                <tr>
+                                    <td class="mono">0x8f2a...4e11</td>
+                                    <td>2026-10-24 09:12</td>
+                                    <td>JPMorgan Chase Clear</td>
+                                    <td class="mono" style="color: var(--status-success);">$500,000.00</td>
+                                    <td><span class="badge-settled">Settled</span></td>
+                                    <td><button class="copy-btn" onclick="openReceipt('0x8f2a...4e11', '$500,000.00', 'JPMorgan Chase Clear')">View Receipt</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="mono">0x3c11...9a4b</td>
+                                    <td>2026-10-24 08:45</td>
+                                    <td>Standard Chartered HK</td>
+                                    <td class="mono" style="color: var(--status-success);">$750,000.00</td>
+                                    <td><span class="badge-settled">Settled</span></td>
+                                    <td><button class="copy-btn" onclick="openReceipt('0x3c11...9a4b', '$750,000.00', 'Standard Chartered HK')">View Receipt</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Receipt Display Modal -->
+    <div class="modal-overlay" id="receipt-modal">
+        <div class="receipt-card">
+            <h2 class="card-title" style="text-align: center; margin-bottom: 20px; font-size: 18px;">Settlement Confirmation Receipt</h2>
+            
+            <div class="receipt-row">
+                <span class="receipt-label">UETR Identifier</span>
+                <span class="receipt-value mono" id="r-uetr">0x0000...0000</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Settlement Amount</span>
+                <span class="receipt-value mono" id="r-amount" style="color: var(--status-success);">$0.00</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Receiving Entity</span>
+                <span class="receipt-value" id="r-entity">N/A</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Network Protocol</span>
+                <span class="registry-value">ISO 20022 SWIFT GPI</span>
+            </div>
+            <div class="receipt-row">
+                <span class="receipt-label">Cryptographic Digest</span>
+                <span class="receipt-value mono" style="font-size: 10px;">SHA256: e3b0c44298fc1c149afbf4c8996fb924</span>
+            </div>
+
+            <button class="btn-primary" style="margin-top: 24px;" onclick="closeReceipt()">Close Record</button>
+        </div>
+    </div>
+
+    <!-- Application Controller Logic -->
+    <script>
+        // Supabase Client Config
+        const SUPABASE_URL = 'https://gtjwxxxbhbxpzqwfbumq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_5c_4hOqIU_-mblQ_VkSwtg_BMTwll-H';
+        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        // Persistent Registry for Authorized Emails
+        function getAuthorizedEmails() {
+            const saved = localStorage.getItem('apex_authorized_emails');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            // Default pre-authorized test accounts
+            return ['treasury@domain.com', 'admin@apex.com', 'bigmanlegacy95@gmail.com'];
+        }
+
+        function addAuthorizedEmail(email) {
+            const list = getAuthorizedEmails();
+            const cleanEmail = email.toLowerCase().trim();
+            if (!list.includes(cleanEmail)) {
+                list.push(cleanEmail);
+                localStorage.setItem('apex_authorized_emails', JSON.stringify(list));
+            }
+        }
+
+        // Tab Switcher Controller
+        const tabLoginBtn = document.getElementById('tab-login-btn');
+        const tabSignupBtn = document.getElementById('tab-signup-btn');
+        const loginPanel = document.getElementById('login-panel');
+        const signupPanel = document.getElementById('signup-panel');
+
+        function switchAuthTab(tab) {
+            if (tab === 'login') {
+                tabLoginBtn.classList.add('active');
+                tabSignupBtn.classList.remove('active');
+                loginPanel.classList.add('active');
+                signupPanel.classList.remove('active');
+            } else {
+                tabSignupBtn.classList.add('active');
+                tabLoginBtn.classList.remove('active');
+                signupPanel.classList.add('active');
+                loginPanel.classList.remove('active');
+            }
+        }
+
+        tabLoginBtn.addEventListener('click', () => switchAuthTab('login'));
+        tabSignupBtn.addEventListener('click', () => switchAuthTab('signup'));
+
+        // Copy TRC20 Wallet Address
+        document.getElementById('copy-address-btn').addEventListener('click', () => {
+            const address = document.getElementById('trc20-address').innerText;
+            navigator.clipboard.writeText(address).then(() => {
+                const btn = document.getElementById('copy-address-btn');
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy', 2000);
+            });
+        });
+
+        // Application Navigation Elements
+        const authView = document.getElementById('auth-view');
+        const dashboardView = document.getElementById('dashboard-view');
+        const sessionBadge = document.getElementById('session-badge');
+
+        // Helper to enter dashboard
+        function enterDashboard(email) {
+            sessionBadge.innerText = 'User: ' + email;
+            authView.classList.remove('active');
+            dashboardView.classList.add('active');
+            initLiquidityChart();
+        }
+
+        // 1. LOG IN SUBMISSION
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
+            const loginBtn = document.getElementById('login-submit-btn');
+
+            if (!emailInput) return;
+
+            loginBtn.innerText = 'Verifying Authorization...';
+            let isAuthorized = false;
+
+            // Check Supabase database
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase
+                        .from('authorized_emails')
+                        .select('email')
+                        .eq('email', emailInput)
+                        .maybeSingle();
+
+                    if (data && data.email) {
+                        isAuthorized = true;
+                    }
+                } catch (err) {
+                    console.log('Supabase check fallback mode active:', err);
+                }
+            }
+
+            // Fallback check against local persistent storage registry
+            if (getAuthorizedEmails().includes(emailInput)) {
+                isAuthorized = true;
+            }
+
+            loginBtn.innerText = 'Log In to Dashboard';
+
+            if (isAuthorized) {
+                enterDashboard(emailInput);
+            } else {
+                alert('Email not authorized in the system. Please complete Sign Up & Activation first.');
+                document.getElementById('signup-email').value = emailInput;
+                switchAuthTab('signup');
+            }
+        });
+
+        // 2. SIGN UP & PAYMENT SUBMISSION
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('signup-email').value.trim().toLowerCase();
+            const signupBtn = document.getElementById('signup-submit-btn');
+            const screenshotInput = document.getElementById('payment-screenshot');
+
+            if (!emailInput) return;
+            if (screenshotInput.files.length === 0) {
+                alert('Please upload your payment verification screenshot proof.');
+                return;
+            }
+
+            signupBtn.innerText = 'Processing Activation...';
+
+            // Add to local registry
+            addAuthorizedEmail(emailInput);
+
+            // Register in Supabase table if available
+            if (supabase) {
+                try {
+                    await supabase
+                        .from('authorized_emails')
+                        .insert([{ email: emailInput, status: 'active' }]);
+                } catch (err) {
+                    console.log('Supabase insert note:', err);
+                }
+            }
+
+            signupBtn.innerText = 'Submit Credentials & Verification';
+            alert('Account successfully activated! Entering dashboard...');
+            enterDashboard(emailInput);
+        });
+
+        // Modal Receipt Controls
+        function openReceipt(uetr, amount, entity) {
+            document.getElementById('r-uetr').innerText = uetr;
+            document.getElementById('r-amount').innerText = amount;
+            document.getElementById('r-entity').innerText = entity;
+            document.getElementById('receipt-modal').classList.add('active');
+        }
+
+        function closeReceipt() {
+            document.getElementById('receipt-modal').classList.remove('active');
+        }
+
+        // Chart Rendering Engine
+        function initLiquidityChart() {
+            const ctx = document.getElementById('liquidityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                    datasets: [{
+                        label: 'Liquidity ($)',
+                        data: [1150000, 1180000, 1210000, 1205000, 1230000, 1245000, 1250000],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
