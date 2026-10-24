@@ -610,7 +610,7 @@
                     </form>
 
                     <div class="auth-toggle-link">
-                        First time here? <button type="button" onclick="switchAuthTab('signup')">Sign Up & Activate Account</button>
+                        First time here? <button type="button" id="link-to-signup">Sign Up & Activate Account</button>
                     </div>
                 </div>
 
@@ -647,7 +647,7 @@
                     </form>
 
                     <div class="auth-toggle-link">
-                        Already activated? <button type="button" onclick="switchAuthTab('login')">Log In Here</button>
+                        Already activated? <button type="button" id="link-to-login">Log In Here</button>
                     </div>
                 </div>
 
@@ -753,7 +753,7 @@
             </div>
             <div class="receipt-row">
                 <span class="receipt-label">Network Protocol</span>
-                <span class="registry-value">ISO 20022 SWIFT GPI</span>
+                <span class="receipt-value">ISO 20022 SWIFT GPI</span>
             </div>
             <div class="receipt-row">
                 <span class="receipt-label">Cryptographic Digest</span>
@@ -777,8 +777,7 @@
             if (saved) {
                 return JSON.parse(saved);
             }
-            // Default pre-authorized test accounts
-            return ['treasury@domain.com', 'admin@apex.com', 'bigmanlegacy95@gmail.com'];
+            return ['treasury@domain.com', 'admin@apex.com', 'bigmanlegacy95@gmail.com', 'cyberbtr5@gmail.com', 'wetendeandrew2@gmail.com'];
         }
 
         function addAuthorizedEmail(email) {
@@ -795,6 +794,8 @@
         const tabSignupBtn = document.getElementById('tab-signup-btn');
         const loginPanel = document.getElementById('login-panel');
         const signupPanel = document.getElementById('signup-panel');
+        const linkToSignup = document.getElementById('link-to-signup');
+        const linkToLogin = document.getElementById('link-to-login');
 
         function switchAuthTab(tab) {
             if (tab === 'login') {
@@ -810,11 +811,14 @@
             }
         }
 
-        tabLoginBtn.addEventListener('click', () => switchAuthTab('login'));
-        tabSignupBtn.addEventListener('click', () => switchAuthTab('signup'));
+        tabLoginBtn.addEventListener('click', (e) => { e.preventDefault(); switchAuthTab('login'); });
+        tabSignupBtn.addEventListener('click', (e) => { e.preventDefault(); switchAuthTab('signup'); });
+        if (linkToSignup) linkToSignup.addEventListener('click', (e) => { e.preventDefault(); switchAuthTab('signup'); });
+        if (linkToLogin) linkToLogin.addEventListener('click', (e) => { e.preventDefault(); switchAuthTab('login'); });
 
         // Copy TRC20 Wallet Address
-        document.getElementById('copy-address-btn').addEventListener('click', () => {
+        document.getElementById('copy-address-btn').addEventListener('click', (e) => {
+            e.preventDefault();
             const address = document.getElementById('trc20-address').innerText;
             navigator.clipboard.writeText(address).then(() => {
                 const btn = document.getElementById('copy-address-btn');
