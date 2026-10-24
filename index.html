@@ -596,7 +596,7 @@
                 <!-- TAB 1: Existing Account Log In Form -->
                 <div id="login-panel" class="tab-panel active">
                     <h1 class="auth-title">Portal Member Sign In</h1>
-                    <p class="auth-subtitle">Enter your activated corporate email to access your sovereign vault.</p>
+                    <p class="auth-subtitle">Enter your authorized corporate email to access your sovereign vault.</p>
 
                     <form id="login-form">
                         <div class="form-group">
@@ -766,12 +766,31 @@
 
     <!-- Application Controller Logic -->
     <script>
-        // Supabase Client Initialization
+        // Supabase Client Config
         const SUPABASE_URL = 'https://gtjwxxxbhbxpzqwfbumq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_5c_4hOqIU_-mblQ_VkSwtg_BMTwll-H';
         const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-        // Tab Switching Logic
+        // Persistent Registry of Authorized Users
+        function getAuthorizedEmails() {
+            const saved = localStorage.getItem('apex_authorized_emails');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            // Default pre-authorized accounts
+            return ['treasury@domain.com', 'admin@apex.com', 'bigmanlegacy95@gmail.com'];
+        }
+
+        function addAuthorizedEmail(email) {
+            const list = getAuthorizedEmails();
+            const cleanEmail = email.toLowerCase().trim();
+            if (!list.includes(cleanEmail)) {
+                list.push(cleanEmail);
+                localStorage.setItem('apex_authorized_emails', JSON.stringify(list));
+            }
+        }
+
+        // Tab Switcher Controller
         const tabLoginBtn = document.getElementById('tab-login-btn');
         const tabSignupBtn = document.getElementById('tab-signup-btn');
         const loginPanel = document.getElementById('login-panel');
@@ -804,84 +823,96 @@
             });
         });
 
-        // Views and Header elements
+        // Application Navigation Elements
         const authView = document.getElementById('auth-view');
         const dashboardView = document.getElementById('dashboard-view');
         const sessionBadge = document.getElementById('session-badge');
 
-        // 1. LOG IN FORM SUBMISSION
+        // Helper to launch main dashboard
+        function enterDashboard(email) {
+            sessionBadge.innerText = 'User: ' + email;
+            authView.classList.remove('active');
+            dashboardView.classList.add('active');
+            initLiquidityChart();
+        }
+
+        // 1. LOG IN SUBMISSION
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
+            const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
             const loginBtn = document.getElementById('login-submit-btn');
 
-            if (!email) return;
+            if (!emailInput) return;
 
-            loginBtn.innerText = 'Verifying Authorization...';
+            loginBtn.innerText = 'Verifying Account...';
 
             let isAuthorized = false;
 
+            // Check Supabase database if connected
             if (supabase) {
                 try {
-                    // Query Supabase table to verify if email is authorized
                     const { data, error } = await supabase
                         .from('authorized_emails')
                         .select('email')
-                        .eq('email', email)
+                        .eq('email', emailInput)
                         .maybeSingle();
 
                     if (data && data.email) {
                         isAuthorized = true;
                     }
                 } catch (err) {
-                    console.error('Supabase verification error:', err);
+                    console.log('Database lookup check:', err);
                 }
             }
 
-            if (!isAuthorized) {
-                alert('Email not authorized in the system. Please complete Sign Up & Activation first.');
-                loginBtn.innerText = 'Log In to Dashboard';
-                document.getElementById('signup-email').value = email;
-                switchAuthTab('signup');
-                return;
+            // Also check local authorization registry
+            const localList = getAuthorizedEmails();
+            if (localList.includes(emailInput)) {
+                isAuthorized = true;
             }
 
-            // Directly let authorized user into the application
-            sessionBadge.innerText = email;
-            authView.classList.remove('active');
-            dashboardView.classList.add('active');
-            initLiquidityChart();
+            loginBtn.innerText = 'Log In to Dashboard';
+
+            // Route user based on verification status
+            if (isAuthorized) {
+                enterDashboard(emailInput);
+            } else {
+                alert('Email address not found or not authorized yet. Redirecting to Sign Up & Activation.');
+                document.getElementById('signup-email').value = emailInput;
+                switchAuthTab('signup');
+            }
         });
 
-        // 2. SIGN UP FORM SUBMISSION
+        // 2. SIGN UP & PAYMENT SUBMISSION
         document.getElementById('signup-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('signup-email').value.trim();
+            const emailInput = document.getElementById('signup-email').value.trim().toLowerCase();
             const signupBtn = document.getElementById('signup-submit-btn');
 
-            if (!email) return;
+            if (!emailInput) return;
 
-            signupBtn.innerText = 'Submitting Activation Request...';
+            signupBtn.innerText = 'Processing Activation...';
 
+            // Register email in local storage authorization registry
+            addAuthorizedEmail(emailInput);
+
+            // Save to Supabase database if active
             if (supabase) {
                 try {
-                    // Add new sign-up record to Supabase authorized table
                     await supabase
                         .from('authorized_emails')
-                        .insert([{ email: email, status: 'pending_payment' }]);
+                        .insert([{ email: emailInput, status: 'active' }]);
                 } catch (err) {
-                    console.error('Sign up registration error:', err);
+                    console.log('Supabase insertion update:', err);
                 }
             }
 
-            alert('Activation request and payment submitted successfully!');
-            sessionBadge.innerText = email;
-            authView.classList.remove('active');
-            dashboardView.classList.add('active');
-            initLiquidityChart();
+            signupBtn.innerText = 'Submit Credentials & Verification';
+            alert('Account activated successfully! Entering dashboard...');
+            enterDashboard(emailInput);
         });
 
-        // Modal Controls
+        // Modal Receipt Controls
         function openReceipt(uetr, amount, entity) {
             document.getElementById('r-uetr').innerText = uetr;
             document.getElementById('r-amount').innerText = amount;
