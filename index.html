@@ -1,845 +1,1552 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apex Financial Infrastructure | Sovereign Web Portal</title>
-    
-    <!-- Typography & Chart Engine -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apex Financial Infrastructure — Secure Gateway</title>
 
-    <!-- Supabase JS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --bg-base: #060911;
-            --bg-surface: #0d1322;
-            --bg-surface-elevated: #141c30;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(59, 130, 246, 0.3);
-            --accent-primary: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.25);
-            --text-main: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --status-success: #10b981;
-            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
+<!-- Supabase JS v2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: var(--font-sans);
-            -webkit-tap-highlight-color: transparent;
-        }
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root{
+  --bg-base:        #060911;
+  --bg-surface:     #0d1322;
+  --bg-elevated:    #131c30;
+  --accent-primary: #3b82f6;
+  --accent-deep:    #2563eb;
+  --accent-soft:    rgba(59,130,246,.14);
+  --status-success: #10b981;
+  --status-warning: #f59e0b;
+  --status-danger:  #ef4444;
 
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
-        }
+  --text-primary:   #e9eefb;
+  --text-secondary: #93a1bd;
+  --text-muted:     #5a6784;
 
-        /* App Header */
-        .app-header {
-            width: 100%;
-            background: rgba(13, 19, 34, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+  --border:         rgba(148,163,184,.13);
+  --border-strong:  rgba(148,163,184,.26);
 
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 700;
-            font-size: 18px;
-            color: var(--text-main);
-        }
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 9px;
 
-        .brand-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent-primary), #1d4ed8);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-        .brand-icon svg {
-            width: 18px;
-            height: 18px;
-            fill: white;
-        }
+  --shadow-card: 0 24px 60px -28px rgba(0,0,0,.9), 0 2px 0 0 rgba(255,255,255,.03) inset;
+}
 
-        .user-badge {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--text-secondary);
-            background: var(--bg-surface-elevated);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
+/* ============================================================
+   RESET / BASE
+   ============================================================ */
+*,*::before,*::after{ box-sizing:border-box; }
 
-        /* Layout Container */
-        .main-container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 32px 24px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 32px;
-        }
+html,body{ height:100%; }
 
-        .view-section {
-            display: none;
-            width: 100%;
-        }
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:
+    radial-gradient(900px 520px at 12% -12%, rgba(59,130,246,.18), transparent 62%),
+    radial-gradient(820px 600px at 96% -4%, rgba(16,185,129,.09), transparent 58%),
+    radial-gradient(700px 700px at 50% 120%, rgba(37,99,235,.08), transparent 60%),
+    var(--bg-base);
+  color:var(--text-primary);
+  font-family:var(--font-sans);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
 
-        .view-section.active {
-            display: block;
-        }
+[hidden]{ display:none !important; }
 
-        /* Gateway Authentication Wrapper */
-        .auth-wrapper {
-            max-width: 480px;
-            margin: 40px auto;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 32px 28px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            position: relative;
-        }
+h1,h2,h3,h4,p{ margin:0; }
+button{ font-family:inherit; }
 
-        .auth-wrapper::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--accent-primary), var(--status-success));
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-        }
+.mono{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
 
-        .auth-tabs {
-            display: flex;
-            background: var(--bg-base);
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 24px;
-            border: 1px solid var(--border-color);
-        }
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:14px clamp(16px,4vw,40px);
+  background:rgba(6,9,17,.72);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
 
-        .auth-tab-btn {
-            flex: 1;
-            padding: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+.topbar-brand{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  font-weight:800;
+  letter-spacing:-.02em;
+  font-size:16px;
+}
+.topbar-brand .accent{ color:var(--accent-primary); }
 
-        .auth-tab-btn.active {
-            background: var(--bg-surface-elevated);
-            color: var(--text-main);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
+.brand-mark{
+  width:34px; height:34px;
+  display:grid; place-items:center;
+  border-radius:10px;
+  font-size:15px; font-weight:800;
+  color:#fff;
+  background:linear-gradient(145deg, var(--accent-primary), var(--accent-deep));
+  box-shadow:0 8px 22px -10px rgba(59,130,246,.95), 0 0 0 1px rgba(255,255,255,.09) inset;
+  flex:0 0 auto;
+}
+.brand-mark.sm{ width:30px; height:30px; font-size:13px; border-radius:9px; }
 
-        .tab-panel {
-            display: none;
-        }
+.topbar-right{ display:flex; align-items:center; gap:10px; }
 
-        .tab-panel.active {
-            display: block;
-        }
+.session-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  padding:7px 13px 7px 11px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,.025);
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--text-secondary);
+  max-width:min(46vw,320px);
+  transition:border-color .3s, color .3s, background .3s;
+}
+.session-badge #session-email{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  letter-spacing:-.01em;
+}
+.session-badge .dot{
+  width:7px; height:7px;
+  border-radius:50%;
+  background:var(--text-muted);
+  flex:0 0 auto;
+  transition:background .3s, box-shadow .3s;
+}
+.session-badge.is-active{
+  border-color:rgba(16,185,129,.42);
+  background:rgba(16,185,129,.09);
+  color:#b8f3e0;
+}
+.session-badge.is-active .dot{
+  background:var(--status-success);
+  box-shadow:0 0 0 3px rgba(16,185,129,.18), 0 0 12px rgba(16,185,129,.85);
+}
 
-        .auth-title {
-            font-size: 22px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 8px;
-        }
+.btn-ghost{
+  padding:7px 13px;
+  border-radius:999px;
+  border:1px solid var(--border-strong);
+  background:transparent;
+  color:var(--text-secondary);
+  font-size:12.5px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+}
+.btn-ghost:hover{ color:#fff; border-color:rgba(59,130,246,.6); background:var(--accent-soft); }
 
-        .auth-subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
+/* ============================================================
+   VIEWS
+   ============================================================ */
+main{ flex:1 0 auto; display:flex; flex-direction:column; }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+.view{ flex:1 0 auto; }
 
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+.fade-in{ animation:viewIn .55s cubic-bezier(.22,1,.36,1) both; }
+@keyframes viewIn{
+  from{ opacity:0; transform:translateY(14px) scale(.994); }
+  to  { opacity:1; transform:none; }
+}
 
-        .form-input {
-            width: 100%;
-            background: var(--bg-base);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 14px 16px;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s ease;
-        }
+/* ============================================================
+   AUTH VIEW
+   ============================================================ */
+#auth-view{
+  display:grid;
+  place-items:center;
+  padding:clamp(28px,6vh,64px) clamp(16px,4vw,40px) 64px;
+}
 
-        .form-input:focus {
-            border-color: var(--accent-primary);
-        }
+.auth-shell{
+  width:100%;
+  max-width:472px;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+}
 
-        .deposit-panel {
-            background: rgba(9, 13, 22, 0.8);
-            border: 1px dashed var(--border-highlight);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
+.auth-brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  text-align:left;
+}
+.auth-brand h1{
+  font-size:clamp(17px,3.4vw,20px);
+  font-weight:800;
+  letter-spacing:-.028em;
+  line-height:1.25;
+}
+.auth-brand p{
+  font-size:12.5px;
+  color:var(--text-muted);
+  font-weight:500;
+  margin-top:2px;
+}
 
-        .deposit-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
+.card{
+  background:linear-gradient(180deg, rgba(19,28,48,.92), rgba(13,19,34,.96));
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-card);
+}
 
-        .network-tag {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--status-success);
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
+.auth-card{ padding:22px; position:relative; overflow:hidden; }
+.auth-card::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(59,130,246,.85), transparent);
+  opacity:.85;
+}
 
-        .address-box {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--text-main);
-            background: var(--bg-surface);
-            padding: 10px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            word-break: break-all;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            margin-top: 6px;
-        }
+/* ---------- Tabs ---------- */
+.tabs{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  padding:4px;
+  margin-bottom:22px;
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  background:rgba(6,9,17,.6);
+}
+.tab-indicator{
+  position:absolute;
+  top:4px; left:4px;
+  width:calc(50% - 4px);
+  height:calc(100% - 8px);
+  border-radius:var(--radius-sm);
+  background:linear-gradient(140deg, var(--accent-primary), var(--accent-deep));
+  box-shadow:0 10px 24px -12px rgba(59,130,246,.95), 0 0 0 1px rgba(255,255,255,.07) inset;
+  transition:transform .34s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+.tabs[data-active="signup"] .tab-indicator{ transform:translateX(100%); }
 
-        .copy-btn {
-            background: none;
-            border: none;
-            color: var(--accent-primary);
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
+.tab{
+  position:relative;
+  z-index:1;
+  padding:11px 6px;
+  border:0;
+  background:transparent;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:-.01em;
+  color:var(--text-secondary);
+  cursor:pointer;
+  border-radius:var(--radius-sm);
+  transition:color .22s;
+}
+.tab:hover{ color:var(--text-primary); }
+.tab.is-active{ color:#fff; }
 
-        .btn-primary {
-            width: 100%;
-            background: var(--accent-primary);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
+/* ---------- Panels ---------- */
+.panel{ animation:panelIn .3s ease both; }
+@keyframes panelIn{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
 
-        .btn-primary:hover {
-            background: #2563eb;
-        }
+.field{ display:block; margin-bottom:16px; }
+.field-label{
+  display:block;
+  margin-bottom:8px;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
 
-        .auth-toggle-link {
-            text-align: center;
-            margin-top: 16px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
+input[type="email"]{
+  width:100%;
+  padding:13px 15px;
+  border-radius:var(--radius-md);
+  border:1px solid var(--border-strong);
+  background:rgba(6,9,17,.78);
+  color:var(--text-primary);
+  font-family:var(--font-sans);
+  font-size:14.5px;
+  font-weight:500;
+  outline:none;
+  transition:border-color .2s, box-shadow .2s, background .2s;
+}
+input[type="email"]::placeholder{ color:#414d67; }
+input[type="email"]:hover{ border-color:rgba(148,163,184,.38); }
+input[type="email"]:focus{
+  border-color:var(--accent-primary);
+  background:rgba(6,9,17,.95);
+  box-shadow:0 0 0 3.5px rgba(59,130,246,.17);
+}
 
-        .auth-toggle-link button {
-            background: none;
-            border: none;
-            color: var(--accent-primary);
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: underline;
-        }
+/* ---------- Buttons ---------- */
+.btn{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  width:100%;
+  padding:13px 18px;
+  border:0;
+  border-radius:var(--radius-md);
+  font-family:var(--font-sans);
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:-.01em;
+  cursor:pointer;
+  transition:transform .16s, box-shadow .24s, opacity .2s, filter .2s;
+}
+.btn-primary{
+  color:#fff;
+  background:linear-gradient(140deg, #4c8ef7, var(--accent-deep));
+  box-shadow:0 16px 34px -18px rgba(59,130,246,.95), 0 0 0 1px rgba(255,255,255,.1) inset;
+}
+.btn-primary:hover{ filter:brightness(1.08); box-shadow:0 20px 40px -18px rgba(59,130,246,1); }
+.btn-primary:active{ transform:translateY(1px) scale(.995); }
+.btn-primary[disabled]{ opacity:.62; cursor:not-allowed; filter:grayscale(.25); }
 
-        /* Dashboard Overview */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 24px;
-        }
+.spinner{
+  display:none;
+  width:15px; height:15px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.32);
+  border-top-color:#fff;
+  animation:spin .7s linear infinite;
+}
+.btn.is-loading .spinner{ display:block; }
+.btn.is-loading .btn-label{ opacity:.75; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
 
-        .card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
-        }
+.hint{
+  margin-top:12px;
+  font-size:12px;
+  line-height:1.5;
+  color:var(--text-muted);
+  text-align:center;
+}
 
-        .col-span-8 { grid-column: span 8; }
-        .col-span-4 { grid-column: span 4; }
-        .col-span-12 { grid-column: span 12; }
+/* ---------- Deposit box ---------- */
+.deposit{
+  padding:14px;
+  margin-bottom:16px;
+  border:1px solid rgba(59,130,246,.28);
+  border-radius:var(--radius-md);
+  background:linear-gradient(160deg, rgba(59,130,246,.1), rgba(59,130,246,.03));
+}
+.deposit-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:9px;
+}
+.deposit-head .field-label{ margin:0; color:#9dbdf2; }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+.badge-net{
+  font-family:var(--font-mono);
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.08em;
+  padding:3px 8px;
+  border-radius:999px;
+  color:#a9c8fb;
+  background:rgba(59,130,246,.16);
+  border:1px solid rgba(59,130,246,.35);
+}
 
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-main);
-        }
+.deposit-address{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 9px 9px 12px;
+  border-radius:var(--radius-sm);
+  background:rgba(6,9,17,.82);
+  border:1px solid var(--border);
+}
+.deposit-address code{
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-family:var(--font-mono);
+  font-size:12px;
+  font-weight:500;
+  color:#cfe0ff;
+  letter-spacing:.01em;
+}
 
-        .balance-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--text-main);
-            margin: 12px 0 4px 0;
-        }
+.copy-btn{
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:32px; height:32px;
+  border-radius:8px;
+  border:1px solid var(--border-strong);
+  background:rgba(255,255,255,.045);
+  color:var(--text-secondary);
+  cursor:pointer;
+  transition:.2s;
+}
+.copy-btn:hover{ color:#fff; border-color:var(--accent-primary); background:var(--accent-soft); }
+.copy-btn.copied{ color:#0b1220; background:var(--status-success); border-color:var(--status-success); }
+.copy-btn svg{ width:15px; height:15px; }
 
-        .balance-delta {
-            font-size: 13px;
-            color: var(--status-success);
-            font-weight: 500;
-        }
+.deposit .hint{ margin-top:10px; text-align:left; font-size:11.5px; }
 
-        .actions-menu {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 24px;
-        }
+/* ---------- File input ---------- */
+input[type="file"]{
+  width:100%;
+  padding:13px;
+  border-radius:var(--radius-md);
+  border:1px dashed var(--border-strong);
+  background:rgba(6,9,17,.7);
+  color:var(--text-secondary);
+  font-family:var(--font-sans);
+  font-size:12.5px;
+  cursor:pointer;
+  transition:border-color .2s, background .2s;
+}
+input[type="file"]:hover{
+  border-color:rgba(59,130,246,.62);
+  background:rgba(59,130,246,.06);
+}
+input[type="file"]::file-selector-button{
+  margin-right:12px;
+  padding:8px 14px;
+  border-radius:8px;
+  border:1px solid var(--border-strong);
+  background:rgba(255,255,255,.06);
+  color:var(--text-primary);
+  font-family:var(--font-sans);
+  font-size:12.5px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+}
+input[type="file"]::file-selector-button:hover{
+  background:var(--accent-soft);
+  border-color:rgba(59,130,246,.65);
+  color:#fff;
+}
 
-        .btn-secondary {
-            background: var(--bg-surface-elevated);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 12px 16px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-        }
+.file-name{
+  display:block;
+  margin-top:8px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--status-success);
+  word-break:break-all;
+}
 
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-        }
+/* ============================================================
+   DASHBOARD VIEW
+   ============================================================ */
+#dashboard-view{ padding:clamp(20px,3.4vw,34px) clamp(16px,4vw,40px) 64px; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
+.dash-inner{
+  max-width:1240px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
 
-        th {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
-        }
+.dash-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.dash-head h2{
+  font-size:clamp(21px,3.4vw,27px);
+  font-weight:800;
+  letter-spacing:-.035em;
+}
+.dash-head p{
+  margin-top:5px;
+  font-size:13px;
+  color:var(--text-muted);
+  font-weight:500;
+}
 
-        td {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
-            color: var(--text-main);
-        }
+.live-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid rgba(16,185,129,.36);
+  background:rgba(16,185,129,.09);
+  color:#8ff0d2;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+.live-pill i{
+  width:6px; height:6px;
+  border-radius:50%;
+  background:var(--status-success);
+  box-shadow:0 0 10px var(--status-success);
+  animation:pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.32; } }
 
-        .mono {
-            font-family: var(--font-mono);
-            font-size: 13px;
-        }
+/* ---------- Stat cards ---------- */
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(196px,1fr));
+  gap:14px;
+}
 
-        .badge-settled {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--status-success);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
+.stat{
+  position:relative;
+  padding:17px 18px;
+  border-radius:var(--radius-lg);
+  border:1px solid var(--border);
+  background:linear-gradient(170deg, rgba(19,28,48,.9), rgba(13,19,34,.94));
+  box-shadow:var(--shadow-card);
+  overflow:hidden;
+}
+.stat::after{
+  content:"";
+  position:absolute;
+  inset:auto -30% -60% auto;
+  width:150px; height:150px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(59,130,246,.16), transparent 68%);
+  pointer-events:none;
+}
+.stat-label{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+.stat-value{
+  margin-top:9px;
+  font-family:var(--font-mono);
+  font-size:clamp(20px,3vw,25px);
+  font-weight:700;
+  letter-spacing:-.035em;
+  color:#fff;
+}
+.stat-delta{
+  margin-top:7px;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-family:var(--font-mono);
+  font-size:11.5px;
+  font-weight:600;
+  color:var(--status-success);
+}
+.stat-delta.down{ color:var(--status-danger); }
 
-        /* Modal Overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(8px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
+/* ---------- Chart ---------- */
+.chart-card{ padding:20px 20px 12px; }
+.chart-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-bottom:6px;
+}
+.chart-head h3{
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.chart-head p{
+  margin-top:3px;
+  font-size:12px;
+  color:var(--text-muted);
+  font-weight:500;
+}
+.chart-legend{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--text-secondary);
+}
+.chart-legend i{
+  width:18px; height:3px;
+  border-radius:2px;
+  background:linear-gradient(90deg, var(--accent-primary), rgba(59,130,246,.15));
+}
 
-        .modal-overlay.active {
-            display: flex;
-        }
+.chart-wrap{ position:relative; width:100%; height:300px; }
+.chart-wrap canvas{ display:block; width:100%; height:100%; }
 
-        .receipt-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-highlight);
-            border-radius: 20px;
-            max-width: 480px;
-            width: 100%;
-            padding: 32px;
-        }
+/* ---------- Ledger ---------- */
+.ledger-card{ padding:20px; }
+.ledger-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px;
+  flex-wrap:wrap;
+}
+.ledger-head h3{
+  font-size:15px;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
 
-        .receipt-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 13px;
-        }
+.table-scroll{ overflow-x:auto; margin:0 -6px; padding:0 6px; }
 
-        .receipt-label {
-            color: var(--text-secondary);
-        }
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:620px;
+  font-size:13px;
+}
+thead th{
+  text-align:left;
+  padding:0 14px 11px;
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{
+  padding:13px 14px;
+  border-bottom:1px solid rgba(148,163,184,.07);
+  color:var(--text-secondary);
+  font-weight:500;
+  white-space:nowrap;
+}
+tbody tr:last-child td{ border-bottom:0; }
+tbody tr{ transition:background .18s; }
+tbody tr:hover{ background:rgba(59,130,246,.055); }
+tbody td:first-child{ color:#cfe0ff; font-family:var(--font-mono); font-size:12px; }
+tbody td.amount{ color:#fff; font-family:var(--font-mono); font-weight:600; }
 
-        .receipt-value {
-            color: var(--text-main);
-            font-weight: 600;
-        }
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:3.5px 10px;
+  border-radius:999px;
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.pill::before{
+  content:"";
+  width:5px; height:5px;
+  border-radius:50%;
+  background:currentColor;
+}
+.pill.success{ color:#5df0c0; background:rgba(16,185,129,.13); border:1px solid rgba(16,185,129,.32); }
+.pill.pending{ color:#ffd28a; background:rgba(245,158,11,.13); border:1px solid rgba(245,158,11,.32); }
+.pill.settled{ color:#9dc4ff; background:rgba(59,130,246,.13); border:1px solid rgba(59,130,246,.32); }
 
-        @media (max-width: 900px) {
-            .col-span-8, .col-span-4 {
-                grid-column: span 12;
-            }
-        }
-    </style>
+/* ---------- Footer ---------- */
+.footer{
+  padding:18px clamp(16px,4vw,40px);
+  border-top:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+  font-size:11.5px;
+  color:var(--text-muted);
+  font-family:var(--font-mono);
+  letter-spacing:.02em;
+}
+.footer span{ white-space:nowrap; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:560px){
+  .auth-card{ padding:18px 16px; }
+  .session-badge{ max-width:52vw; }
+  .chart-wrap{ height:238px; }
+  .stat{ padding:15px; }
+  .footer{ justify-content:center; text-align:center; }
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    transition-duration:.001ms !important;
+  }
+}
+</style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
-    <header class="app-header">
-        <div class="brand-logo">
-            <div class="brand-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 19h20L12 2zm0 3.8L18.4 17H5.6L12 5.8z"/></svg>
-            </div>
-            <span>Apex Financial</span>
-        </div>
-        <div class="header-actions">
-            <span class="user-badge" id="session-badge">Session: Verification Required</span>
-        </div>
-    </header>
+<!-- ============================================================
+     TOP BAR
+     ============================================================ -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-mark sm">A</div>
+    <span>Apex<span class="accent">Fi</span></span>
+  </div>
 
-    <!-- Main Content Area -->
-    <main class="main-container">
-
-        <!-- STEP 1: Authentication & Activation Gateway -->
-        <section id="auth-view" class="view-section active">
-            <div class="auth-wrapper">
-                
-                <!-- Toggle Tabs: Existing User vs First-Time Sign Up -->
-                <div class="auth-tabs">
-                    <button type="button" class="auth-tab-btn active" id="tab-login-btn">Log In</button>
-                    <button type="button" class="auth-tab-btn" id="tab-signup-btn">Sign Up / Activate</button>
-                </div>
-
-                <!-- TAB 1: Existing Account Log In Form -->
-                <div id="login-panel" class="tab-panel active">
-                    <h1 class="auth-title">Portal Member Sign In</h1>
-                    <p class="auth-subtitle">Enter your authorized corporate email to access your sovereign vault.</p>
-
-                    <form id="login-form">
-                        <div class="form-group">
-                            <label class="form-label" for="login-email">Account Email</label>
-                            <input type="email" id="login-email" class="form-input" required placeholder="treasury@domain.com">
-                        </div>
-
-                        <button type="submit" class="btn-primary" id="login-submit-btn">
-                            <span>Log In to Dashboard</span>
-                        </button>
-                    </form>
-
-                    <div class="auth-toggle-link">
-                        First time here? <button type="button" id="link-to-signup">Sign Up & Activate Account</button>
-                    </div>
-                </div>
-
-                <!-- TAB 2: First-Time Registration & Payment Flow -->
-                <div id="signup-panel" class="tab-panel">
-                    <h1 class="auth-title">Account Activation</h1>
-                    <p class="auth-subtitle">Provide your email and complete activation network funding proof.</p>
-
-                    <form id="signup-form">
-                        <div class="form-group">
-                            <label class="form-label" for="signup-email">Active Account Email</label>
-                            <input type="email" id="signup-email" class="form-input" required placeholder="treasury@domain.com">
-                        </div>
-
-                        <div class="deposit-panel">
-                            <div class="deposit-header">
-                                <span class="form-label" style="margin: 0;">USDT Deposit Address</span>
-                                <span class="network-tag">TRC20 Network</span>
-                            </div>
-                            <div class="address-box">
-                                <span id="trc20-address">THk4mbVVxrQ1msFrphcmCDEKXti5qEzFoq</span>
-                                <button type="button" class="copy-btn" id="copy-address-btn">Copy</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="payment-screenshot">Payment Verification Proof</label>
-                            <input type="file" id="payment-screenshot" accept="image/*" class="form-input" required>
-                        </div>
-
-                        <button type="submit" class="btn-primary" id="signup-submit-btn">
-                            <span>Submit Credentials & Verification</span>
-                        </button>
-                    </form>
-
-                    <div class="auth-toggle-link">
-                        Already activated? <button type="button" id="link-to-login">Log In Here</button>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- STEP 2: Primary Financial Dashboard -->
-        <section id="dashboard-view" class="view-section">
-            <div class="dashboard-grid">
-                
-                <!-- Main Liquidity Panel -->
-                <div class="card col-span-8">
-                    <div class="card-header">
-                        <span class="card-title">Corporate Vault Liquidity</span>
-                        <span class="badge-settled">Real-Time Clearing</span>
-                    </div>
-                    <div class="balance-value">$1,250,000.00 <span style="font-size: 16px; color: var(--text-secondary); font-weight: 400;">USD</span></div>
-                    <div class="balance-delta">
-                        <span>+2.4% yield settlement auto-credited</span>
-                    </div>
-
-                    <div style="height: 180px; margin-top: 24px; width: 100%;">
-                        <canvas id="liquidityChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Account Actions -->
-                <div class="card col-span-4">
-                    <div class="card-header">
-                        <span class="card-title">Quick Execution</span>
-                    </div>
-                    <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">Execute instantaneous settlement instructions across connected liquidity corridors.</p>
-                    
-                    <div class="actions-menu">
-                        <button class="btn-secondary" id="btn-open-transfer">Initiate Wire</button>
-                        <button class="btn-secondary" id="btn-open-connect">Connect Account</button>
-                    </div>
-                </div>
-
-                <!-- Transaction Ledger -->
-                <div class="card col-span-12">
-                    <div class="card-header">
-                        <span class="card-title">Settlement Audit Trail</span>
-                        <button class="btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="location.reload()">Refresh Ledger</button>
-                    </div>
-
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Transaction UETR</th>
-                                    <th>Timestamp (UTC)</th>
-                                    <th>Counterparty</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="mono">0x8f2a...4e11</td>
-                                    <td>2026-10-24 09:12</td>
-                                    <td>JPMorgan Chase Clear</td>
-                                    <td class="mono" style="color: var(--status-success);">$500,000.00</td>
-                                    <td><span class="badge-settled">Settled</span></td>
-                                    <td><button class="copy-btn" onclick="openReceipt('0x8f2a...4e11', '$500,000.00', 'JPMorgan Chase Clear')">View Receipt</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Receipt Modal -->
-    <div class="modal-overlay" id="receipt-modal">
-        <div class="receipt-card">
-            <h2 class="card-title" style="text-align: center; margin-bottom: 20px; font-size: 18px;">Settlement Confirmation Receipt</h2>
-            
-            <div class="receipt-row">
-                <span class="receipt-label">UETR Identifier</span>
-                <span class="receipt-value mono" id="r-uetr">0x0000...0000</span>
-            </div>
-            <div class="receipt-row">
-                <span class="receipt-label">Settlement Amount</span>
-                <span class="receipt-value mono" id="r-amount" style="color: var(--status-success);">$0.00</span>
-            </div>
-            <div class="receipt-row">
-                <span class="receipt-label">Receiving Entity</span>
-                <span class="receipt-value" id="r-entity">N/A</span>
-            </div>
-
-            <button class="btn-primary" style="margin-top: 24px;" onclick="closeReceipt()">Close Record</button>
-        </div>
+  <div class="topbar-right">
+    <div class="session-badge" id="session-badge">
+      <span class="dot"></span>
+      <span id="session-email">Not authenticated</span>
     </div>
+    <button type="button" class="btn-ghost" id="logout-btn" hidden>Sign Out</button>
+  </div>
+</header>
 
-    <!-- Application Script Logic -->
-    <script>
-        // Supabase Client Initialization
-        const SUPABASE_URL = 'https://gtjwxxxbhbxpzqwfbumq.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_5c_4hOqIU_-mblQ_VkSwtg_BMTwll-H';
-        const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+<main>
 
-        // Persistent Registry for Authorized Emails
-        function getAuthorizedEmails() {
-            const saved = localStorage.getItem('apex_authorized_emails');
-            if (saved) {
-                return JSON.parse(saved);
-            }
-            return ['treasury@domain.com', 'admin@apex.com', 'bigmanlegacy95@gmail.com', 'cyberbtr5@gmail.com', 'wetendeandrew2@gmail.com'];
+  <!-- ==========================================================
+       AUTH VIEW
+       ========================================================== -->
+  <section id="auth-view" class="view">
+    <div class="auth-shell">
+
+      <div class="auth-brand">
+        <div class="brand-mark">A</div>
+        <div>
+          <h1>Apex Financial Infrastructure</h1>
+          <p>Institutional liquidity &amp; settlement network</p>
+        </div>
+      </div>
+
+      <div class="card auth-card">
+
+        <!-- Tab switcher -->
+        <div class="tabs" id="auth-tabs" data-active="login" role="tablist" aria-label="Authentication mode">
+          <span class="tab-indicator" id="tab-indicator" aria-hidden="true"></span>
+          <button type="button" class="tab is-active" id="tab-login" role="tab"
+                  aria-selected="true" aria-controls="login-panel" data-target="login-panel">Log In</button>
+          <button type="button" class="tab" id="tab-signup" role="tab"
+                  aria-selected="false" aria-controls="signup-panel" data-target="signup-panel">Sign Up / Activate</button>
+        </div>
+
+        <!-- ---------------- LOGIN PANEL ---------------- -->
+        <div class="panel" id="login-panel" role="tabpanel" aria-labelledby="tab-login">
+          <form id="login-form" novalidate>
+            <label class="field">
+              <span class="field-label">Corporate Email</span>
+              <input type="email" id="login-email" name="email"
+                     placeholder="you@company.com" autocomplete="email" spellcheck="false" required>
+            </label>
+
+            <button type="submit" id="login-submit-btn" class="btn btn-primary">
+              <span class="spinner" aria-hidden="true"></span>
+              <span class="btn-label">Log In to Dashboard</span>
+            </button>
+
+            <p class="hint">Access is restricted to verified institutional accounts.<br>Contact your account manager for provisioning.</p>
+          </form>
+        </div>
+
+        <!-- ---------------- SIGN UP PANEL ---------------- -->
+        <div class="panel" id="signup-panel" role="tabpanel" aria-labelledby="tab-signup" hidden>
+          <form id="signup-form" novalidate>
+
+            <label class="field">
+              <span class="field-label">Corporate Email</span>
+              <input type="email" id="signup-email" name="email"
+                     placeholder="you@company.com" autocomplete="email" spellcheck="false" required>
+            </label>
+
+            <div class="deposit">
+              <div class="deposit-head">
+                <span class="field-label">TRC20 USDT Deposit Address</span>
+                <span class="badge-net">TRON · TRC20</span>
+              </div>
+
+              <div class="deposit-address">
+                <code id="trc20-address">THk4mbVVxrQ1msFrphcmCDEKXti5qEzFoq</code>
+                <button type="button" class="copy-btn" id="copy-address-btn" aria-label="Copy deposit address" title="Copy address">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="9" y="9" width="12" height="12" rx="2"></rect>
+                    <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+                  </svg>
+                </button>
+              </div>
+
+              <p class="hint">Send the activation deposit to the address above, then upload the transaction screenshot below.</p>
+            </div>
+
+            <label class="field">
+              <span class="field-label">Payment Screenshot</span>
+              <input type="file" id="payment-screenshot" name="screenshot" accept="image/*" required>
+              <span class="file-name" id="file-name" aria-live="polite"></span>
+            </label>
+
+            <button type="submit" id="signup-submit-btn" class="btn btn-primary">
+              <span class="spinner" aria-hidden="true"></span>
+              <span class="btn-label">Submit Credentials &amp; Verification</span>
+            </button>
+
+            <p class="hint">Verification is typically completed within one business day.</p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       DASHBOARD VIEW
+       ========================================================== -->
+  <section id="dashboard-view" class="view" hidden>
+    <div class="dash-inner">
+
+      <div class="dash-head">
+        <div>
+          <h2>Financial Dashboard</h2>
+          <p>Real-time liquidity position &amp; settlement ledger</p>
+        </div>
+        <span class="live-pill"><i></i>Live Feed</span>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="stat-label">Total Liquidity</div>
+          <div class="stat-value">$103.7M</div>
+          <div class="stat-delta">▲ 9.7% <span style="color:var(--text-muted);font-weight:500;">vs. last quarter</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Settled Volume (24h)</div>
+          <div class="stat-value">$14.28M</div>
+          <div class="stat-delta">▲ 3.2% <span style="color:var(--text-muted);font-weight:500;">vs. prior day</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Active Mandates</div>
+          <div class="stat-value">28</div>
+          <div class="stat-delta">▲ 2 <span style="color:var(--text-muted);font-weight:500;">new this week</span></div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Reserve Ratio</div>
+          <div class="stat-value">142.6%</div>
+          <div class="stat-delta down">▼ 0.4% <span style="color:var(--text-muted);font-weight:500;">vs. prior day</span></div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="card chart-card">
+        <div class="chart-head">
+          <div>
+            <h3>Liquidity Position</h3>
+            <p>Aggregated USD reserves · trailing 12 months</p>
+          </div>
+          <div class="chart-legend"><i></i> USD Millions</div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="liquidity-chart" role="img" aria-label="Liquidity position chart for the trailing twelve months"></canvas>
+        </div>
+      </div>
+
+      <!-- Ledger -->
+      <div class="card ledger-card">
+        <div class="ledger-head">
+          <h3>Settlement Ledger</h3>
+          <span class="live-pill" style="border-color:var(--border-strong);background:rgba(255,255,255,.03);color:var(--text-secondary);">
+            <i style="background:var(--accent-primary);box-shadow:0 0 10px var(--accent-primary);"></i>Last 5 entries
+          </span>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Reference</th>
+                <th>Instrument</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Value Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>APX-2041</td>
+                <td>Settlement · USDT</td>
+                <td class="amount">+ 24,500.00</td>
+                <td><span class="pill success">Cleared</span></td>
+                <td class="mono">2026-02-11</td>
+              </tr>
+              <tr>
+                <td>APX-2038</td>
+                <td>Liquidity Sweep · USD</td>
+                <td class="amount">+ 182,000.00</td>
+                <td><span class="pill settled">Settled</span></td>
+                <td class="mono">2026-02-10</td>
+              </tr>
+              <tr>
+                <td>APX-2035</td>
+                <td>Custody Transfer · BTC</td>
+                <td class="amount">− 4.8120</td>
+                <td><span class="pill pending">Pending</span></td>
+                <td class="mono">2026-02-10</td>
+              </tr>
+              <tr>
+                <td>APX-2031</td>
+                <td>Collateral Top-Up · USDT</td>
+                <td class="amount">+ 96,400.00</td>
+                <td><span class="pill success">Cleared</span></td>
+                <td class="mono">2026-02-09</td>
+              </tr>
+              <tr>
+                <td>APX-2027</td>
+                <td>Redemption · USD</td>
+                <td class="amount">− 51,250.00</td>
+                <td><span class="pill settled">Settled</span></td>
+                <td class="mono">2026-02-08</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span>© 2026 Apex Financial Infrastructure</span>
+  <span>Encrypted session · AES-256 · TRC20 Network</span>
+</footer>
+
+<!-- ============================================================
+     APPLICATION SCRIPT
+     ============================================================ -->
+<script>
+(function () {
+  'use strict';
+
+  /* ==========================================================
+     SUPABASE INITIALIZATION
+     ========================================================== */
+  const SUPABASE_URL      = 'https://gtjwxxxbhbxpzqwfbumq.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_5c_4hOqIU_-mblQ_VkSwtg_BMTwll-H';
+  const supabase = window.supabase
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+
+  /* ==========================================================
+     CONSTANTS
+     ========================================================== */
+  const STORAGE_KEY      = 'apex_authorized_emails';
+  const SESSION_KEY      = 'apex_session_email';
+  const TRC20_ADDRESS    = 'THk4mbVVxrQ1msFrphcmCDEKXti5qEzFoq';
+
+  /* Local fallback test accounts — used when Supabase is unreachable
+     or the email has already been activated on this device. */
+  const FALLBACK_TEST_EMAILS = [
+    'demo@apexfi.io',
+    'admin@apexfi.io',
+    'investor@apexfi.io',
+    'test@apexfi.io'
+  ];
+
+  /* ==========================================================
+     DOM REFS
+     ========================================================== */
+  const authView        = document.getElementById('auth-view');
+  const dashboardView   = document.getElementById('dashboard-view');
+
+  const authTabs        = document.getElementById('auth-tabs');
+  const tabLoginBtn     = document.getElementById('tab-login');
+  const tabSignupBtn    = document.getElementById('tab-signup');
+  const loginPanel      = document.getElementById('login-panel');
+  const signupPanel     = document.getElementById('signup-panel');
+
+  const loginForm       = document.getElementById('login-form');
+  const loginEmail      = document.getElementById('login-email');
+  const loginSubmitBtn  = document.getElementById('login-submit-btn');
+
+  const signupForm      = document.getElementById('signup-form');
+  const signupEmail     = document.getElementById('signup-email');
+  const signupSubmitBtn = document.getElementById('signup-submit-btn');
+  const screenshotInput = document.getElementById('payment-screenshot');
+  const fileNameLabel   = document.getElementById('file-name');
+
+  const copyAddressBtn  = document.getElementById('copy-address-btn');
+
+  const sessionBadge    = document.getElementById('session-badge');
+  const sessionEmailEl  = document.getElementById('session-email');
+  const logoutBtn       = document.getElementById('logout-btn');
+
+  /* ==========================================================
+     SMALL HELPERS
+     ========================================================== */
+  const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
+
+  function setLoading(button, isLoading) {
+    if (!button) return;
+    button.classList.toggle('is-loading', !!isLoading);
+    button.disabled = !!isLoading;
+  }
+
+  /* --- Local activation registry (fallback persistence) --- */
+  function getLocalRegistry() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.map(normalizeEmail) : [];
+    } catch (err) {
+      console.warn('[Apex] Could not read local registry:', err);
+      return [];
+    }
+  }
+
+  function addToLocalRegistry(email) {
+    try {
+      const registry = getLocalRegistry();
+      if (!registry.includes(email)) {
+        registry.push(email);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(registry));
+      }
+    } catch (err) {
+      console.warn('[Apex] Could not write local registry:', err);
+    }
+  }
+
+  /* --- Session persistence --- */
+  function saveSession(email) {
+    try { localStorage.setItem(SESSION_KEY, email); } catch (err) { /* noop */ }
+  }
+  function readSession() {
+    try { return localStorage.getItem(SESSION_KEY); } catch (err) { return null; }
+  }
+  function clearSession() {
+    try { localStorage.removeItem(SESSION_KEY); } catch (err) { /* noop */ }
+  }
+
+  /* ==========================================================
+     TAB SWITCHER
+     ========================================================== */
+  function activateTab(which) {
+    const isSignup = which === 'signup';
+
+    authTabs.dataset.active = isSignup ? 'signup' : 'login';
+
+    tabLoginBtn.classList.toggle('is-active', !isSignup);
+    tabSignupBtn.classList.toggle('is-active', isSignup);
+
+    tabLoginBtn.setAttribute('aria-selected', String(!isSignup));
+    tabSignupBtn.setAttribute('aria-selected', String(isSignup));
+
+    loginPanel.hidden = isSignup;
+    signupPanel.hidden = !isSignup;
+
+    // Re-trigger panel entrance animation
+    const panel = isSignup ? signupPanel : loginPanel;
+    panel.style.animation = 'none';
+    void panel.offsetWidth;
+    panel.style.animation = '';
+  }
+
+  tabLoginBtn.addEventListener('click', () => activateTab('login'));
+  tabSignupBtn.addEventListener('click', () => activateTab('signup'));
+
+  /* ==========================================================
+     VIEW TRANSITIONS
+     ========================================================== */
+  function showDashboard(email) {
+    sessionEmailEl.textContent = email;
+    sessionBadge.classList.add('is-active');
+    logoutBtn.hidden = false;
+
+    authView.hidden = true;
+    dashboardView.hidden = false;
+
+    dashboardView.classList.remove('fade-in');
+    void dashboardView.offsetWidth;
+    dashboardView.classList.add('fade-in');
+
+    saveSession(email);
+
+    // Render the liquidity chart after layout settles
+    requestAnimationFrame(() => initLiquidityChart());
+  }
+
+  function showAuth() {
+    dashboardView.hidden = true;
+    authView.hidden = false;
+
+    authView.classList.remove('fade-in');
+    void authView.offsetWidth;
+    authView.classList.add('fade-in');
+
+    sessionEmailEl.textContent = 'Not authenticated';
+    sessionBadge.classList.remove('is-active');
+    logoutBtn.hidden = true;
+
+    loginForm.reset();
+    signupForm.reset();
+    fileNameLabel.textContent = '';
+
+    activateTab('login');
+    clearSession();
+  }
+
+  logoutBtn.addEventListener('click', showAuth);
+
+  /* ==========================================================
+     LOGIN HANDLER
+     ========================================================== */
+  loginForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const inputEmail = normalizeEmail(loginEmail.value);
+
+    if (!inputEmail || !inputEmail.includes('@')) {
+      alert('Please enter a valid corporate email address.');
+      return;
+    }
+
+    setLoading(loginSubmitBtn, true);
+
+    let authorized = false;
+    let source = 'none';
+
+    /* --- 1. Authoritative lookup against Supabase --- */
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('authorized_emails')
+          .select('email')
+          .eq('email', inputEmail)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data && data.email) {
+          authorized = true;
+          source = 'supabase';
         }
+      } catch (err) {
+        console.warn('[Apex] Supabase lookup failed — using local fallback:', err);
+      }
+    }
 
-        function addAuthorizedEmail(email) {
-            const list = getAuthorizedEmails();
-            const cleanEmail = email.toLowerCase().trim();
-            if (!list.includes(cleanEmail)) {
-                list.push(cleanEmail);
-                localStorage.setItem('apex_authorized_emails', JSON.stringify(list));
-            }
+    /* --- 2. Fallback: test list --- */
+    if (!authorized && FALLBACK_TEST_EMAILS.includes(inputEmail)) {
+      authorized = true;
+      source = 'test-list';
+    }
+
+    /* --- 3. Fallback: locally activated on this device --- */
+    if (!authorized && getLocalRegistry().includes(inputEmail)) {
+      authorized = true;
+      source = 'local-registry';
+    }
+
+    setLoading(loginSubmitBtn, false);
+
+    if (authorized) {
+      console.info('[Apex] Access granted via ' + source + ' for ' + inputEmail);
+      showDashboard(inputEmail);
+      return;
+    }
+
+    /* --- Not authorized --- */
+    alert('Email not authorized. Please complete Sign Up & Activation first.');
+
+    activateTab('signup');
+    signupEmail.value = inputEmail;
+    signupEmail.focus();
+
+    setTimeout(() => {
+      document.getElementById('signup-panel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+  });
+
+  /* ==========================================================
+     SIGN-UP / ACTIVATION HANDLER
+     ========================================================== */
+  signupForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const inputEmail = normalizeEmail(signupEmail.value);
+    const file = screenshotInput.files && screenshotInput.files[0];
+
+    if (!inputEmail || !inputEmail.includes('@')) {
+      alert('Please enter a valid corporate email address.');
+      signupEmail.focus();
+      return;
+    }
+
+    if (!file) {
+      alert('Please upload your TRC20 payment screenshot before submitting.');
+      screenshotInput.focus();
+      return;
+    }
+
+    setLoading(signupSubmitBtn, true);
+
+    /* --- Register in Supabase --- */
+    if (supabase) {
+      try {
+        const { error } = await supabase
+          .from('authorized_emails')
+          .insert([{ email: inputEmail, status: 'active' }]);
+
+        if (error && error.code !== '23505') { // 23505 = duplicate key (already active)
+          console.warn('[Apex] Supabase insert returned an error:', error);
         }
+      } catch (err) {
+        console.warn('[Apex] Supabase insert failed:', err);
+      }
+    } else {
+      console.warn('[Apex] Supabase client unavailable — writing to local registry only.');
+    }
 
-        // Tab Switching Logic
-        const tabLoginBtn = document.getElementById('tab-login-btn');
-        const tabSignupBtn = document.getElementById('tab-signup-btn');
-        const loginPanel = document.getElementById('login-panel');
-        const signupPanel = document.getElementById('signup-panel');
-        const linkToSignup = document.getElementById('link-to-signup');
-        const linkToLogin = document.getElementById('link-to-login');
+    /* --- Always persist locally as a fallback --- */
+    addToLocalRegistry(inputEmail);
 
-        function switchAuthTab(tab) {
-            if (tab === 'login') {
-                tabLoginBtn.classList.add('active');
-                tabSignupBtn.classList.remove('active');
-                loginPanel.classList.add('active');
-                signupPanel.classList.remove('active');
-            } else {
-                tabSignupBtn.classList.add('active');
-                tabLoginBtn.classList.remove('active');
-                signupPanel.classList.add('active');
-                loginPanel.classList.remove('active');
-            }
+    setLoading(signupSubmitBtn, false);
+
+    alert('Account successfully activated! Entering dashboard...');
+
+    showDashboard(inputEmail);
+  });
+
+  /* ==========================================================
+     FILE INPUT FEEDBACK
+     ========================================================== */
+  screenshotInput.addEventListener('change', function () {
+    const file = screenshotInput.files && screenshotInput.files[0];
+    if (!file) {
+      fileNameLabel.textContent = '';
+      return;
+    }
+    const kb = (file.size / 1024).toFixed(1);
+    fileNameLabel.textContent = '✓ ' + file.name + ' · ' + kb + ' KB';
+  });
+
+  /* ==========================================================
+     COPY DEPOSIT ADDRESS
+     ========================================================== */
+  copyAddressBtn.addEventListener('click', async function () {
+    const address = TRC20_ADDRESS;
+
+    const flashCopied = () => {
+      copyAddressBtn.classList.add('copied');
+      setTimeout(() => copyAddressBtn.classList.remove('copied'), 1400);
+    };
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(address);
+        flashCopied();
+      } else {
+        // Legacy fallback
+        const tmp = document.createElement('textarea');
+        tmp.value = address;
+        tmp.setAttribute('readonly', '');
+        tmp.style.position = 'fixed';
+        tmp.style.opacity = '0';
+        document.body.appendChild(tmp);
+        tmp.select();
+        document.execCommand('copy');
+        document.body.removeChild(tmp);
+        flashCopied();
+      }
+    } catch (err) {
+      console.warn('[Apex] Clipboard write failed:', err);
+      alert('Copy failed. Deposit address:\n' + address);
+    }
+  });
+
+  /* ==========================================================
+     LIQUIDITY CHART (vanilla canvas renderer)
+     ========================================================== */
+  const LIQUIDITY_SERIES = [42.4, 48.1, 44.9, 57.2, 61.8, 58.4, 70.3, 78.6, 74.2, 86.9, 94.5, 103.7];
+  const MONTH_LABELS     = ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
+
+  let chartRAF = null;
+  let chartProgress = 0;
+  let chartResizeBound = false;
+
+  function initLiquidityChart() {
+    const canvas = document.getElementById('liquidity-chart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const data = LIQUIDITY_SERIES;
+    const labels = MONTH_LABELS;
+
+    /* ---------- Sizing ---------- */
+    let dims = { w: 0, h: 0 };
+
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      const rect = parent.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      const w = Math.max(280, Math.round(rect.width));
+      const h = Math.max(180, Math.round(rect.height));
+
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      dims = { w, h };
+    }
+
+    /* ---------- Drawing ---------- */
+    function draw(progress) {
+      const w = dims.w;
+      const h = dims.h;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const padL = 56, padR = 18, padT = 20, padB = 34;
+      const plotW = Math.max(10, w - padL - padR);
+      const plotH = Math.max(10, h - padT - padB);
+
+      const dataMin = Math.min.apply(null, data);
+      const dataMax = Math.max.apply(null, data);
+      const span = Math.max(1, dataMax - dataMin);
+
+      const lo = dataMin - span * 0.20;
+      const hi = dataMax + span * 0.14;
+
+      const X = (i) => padL + (plotW * i) / (data.length - 1);
+      const Y = (v) => padT + plotH - ((v - lo) / (hi - lo)) * plotH;
+
+      /* --- Grid lines + Y axis labels --- */
+      const gridSteps = 4;
+      ctx.lineWidth = 1;
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'right';
+
+      for (let s = 0; s <= gridSteps; s++) {
+        const value = lo + ((hi - lo) * s) / gridSteps;
+        const y = Y(value);
+
+        ctx.strokeStyle = 'rgba(148,163,184,.10)';
+        ctx.beginPath();
+        ctx.moveTo(padL, y + 0.5);
+        ctx.lineTo(w - padR, y + 0.5);
+        ctx.stroke();
+
+        ctx.fillStyle = '#5a6784';
+        ctx.fillText('$' + value.toFixed(0) + 'M', padL - 12, y);
+      }
+
+      /* --- X axis labels --- */
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = '#5a6784';
+
+      const labelStep = plotW < 520 ? 2 : 1;
+      for (let i = 0; i < labels.length; i++) {
+        if (i % labelStep !== 0 && i !== labels.length - 1) continue;
+        ctx.fillText(labels[i], X(i), h - padB + 11);
+      }
+
+      /* --- Baseline --- */
+      const baseY = padT + plotH;
+      ctx.strokeStyle = 'rgba(148,163,184,.18)';
+      ctx.beginPath();
+      ctx.moveTo(padL, baseY + 0.5);
+      ctx.lineTo(w - padR, baseY + 0.5);
+      ctx.stroke();
+
+      /* --- Helper path builders --- */
+      function traceLine() {
+        ctx.beginPath();
+        for (let i = 0; i < data.length; i++) {
+          const x = X(i), y = Y(data[i]);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
         }
+      }
 
-        tabLoginBtn.addEventListener('click', (e) => { e.preventDefault(); switchAuthTab('login'); });
-        tabSignupBtn.addEventListener('click', (e) => { e.preventDefault(); switchAuthTab('signup'); });
-        if (linkToSignup) linkToSignup.addEventListener('click', (e) => { e.preventDefault(); switchAuthTab('signup'); });
-        if (linkToLogin) linkToLogin.addEventListener('click', (e) => { e.preventDefault(); switchAuthTab('login'); });
+      /* --- Clipped reveal --- */
+      const revealW = plotW * progress + 6;
 
-        // Copy TRC20 Address
-        document.getElementById('copy-address-btn').addEventListener('click', (e) => {
-            e.preventDefault();
-            const address = document.getElementById('trc20-address').innerText;
-            navigator.clipboard.writeText(address).then(() => {
-                const btn = document.getElementById('copy-address-btn');
-                btn.innerText = 'Copied!';
-                setTimeout(() => btn.innerText = 'Copy', 2000);
-            });
-        });
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(padL - 2, 0, revealW, h);
+      ctx.clip();
 
-        const authView = document.getElementById('auth-view');
-        const dashboardView = document.getElementById('dashboard-view');
-        const sessionBadge = document.getElementById('session-badge');
+      // Area fill
+      traceLine();
+      ctx.lineTo(X(data.length - 1), baseY);
+      ctx.lineTo(X(0), baseY);
+      ctx.closePath();
 
-        function enterDashboard(email) {
-            sessionBadge.innerText = 'User: ' + email;
-            authView.classList.remove('active');
-            dashboardView.classList.add('active');
-            initLiquidityChart();
+      const areaGradient = ctx.createLinearGradient(0, padT, 0, baseY);
+      areaGradient.addColorStop(0, 'rgba(59,130,246,.36)');
+      areaGradient.addColorStop(0.55, 'rgba(59,130,246,.12)');
+      areaGradient.addColorStop(1, 'rgba(59,130,246,0)');
+      ctx.fillStyle = areaGradient;
+      ctx.fill();
+
+      // Line stroke with glow
+      traceLine();
+      ctx.lineWidth = 5;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = 'rgba(59,130,246,.18)';
+      ctx.stroke();
+
+      traceLine();
+      ctx.lineWidth = 2.4;
+      ctx.strokeStyle = '#3b82f6';
+      ctx.stroke();
+
+      ctx.restore();
+
+      /* --- Leading dot --- */
+      const floatIndex = progress * (data.length - 1);
+      const i0 = Math.floor(floatIndex);
+      const i1 = Math.min(data.length - 1, i0 + 1);
+      const t = floatIndex - i0;
+
+      const dotX = X(i0) + (X(i1) - X(i0)) * t;
+      const dotY = Y(data[i0]) + (Y(data[i1]) - Y(data[i0])) * t;
+
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 11, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(59,130,246,.16)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#3b82f6';
+      ctx.shadowColor = 'rgba(59,130,246,.95)';
+      ctx.shadowBlur = 16;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.beginPath();
+      ctx.arc(dotX, dotY, 2.1, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+    }
+
+    /* ---------- Animation ---------- */
+    function animateIn() {
+      if (chartRAF) cancelAnimationFrame(chartRAF);
+
+      const duration = 1150;
+      const start = performance.now();
+
+      function frame(now) {
+        const raw = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - raw, 3); // easeOutCubic
+
+        chartProgress = eased;
+        draw(eased);
+
+        if (raw < 1) {
+          chartRAF = requestAnimationFrame(frame);
+        } else {
+          chartRAF = null;
+          chartProgress = 1;
         }
+      }
 
-        // 1. LOG IN SUBMISSION
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
-            const loginBtn = document.getElementById('login-submit-btn');
+      chartRAF = requestAnimationFrame(frame);
+    }
 
-            if (!emailInput) return;
+    /* ---------- Boot ---------- */
+    resizeCanvas();
+    draw(0);
+    animateIn();
 
-            loginBtn.innerText = 'Verifying Authorization...';
-            let isAuthorized = false;
+    if (!chartResizeBound) {
+      chartResizeBound = true;
+      window.addEventListener('resize', function () {
+        // Only redraw while the dashboard is visible
+        if (dashboardView.hidden) return;
+        resizeCanvas();
+        draw(chartProgress > 0 ? chartProgress : 1);
+      });
+    }
+  }
 
-            if (supabase) {
-                try {
-                    const { data } = await supabase
-                        .from('authorized_emails')
-                        .select('email')
-                        .eq('email', emailInput)
-                        .maybeSingle();
+  /* ==========================================================
+     BOOTSTRAP
+     ========================================================== */
+  function boot() {
+    // Restore an existing session if present
+    const existing = normalizeEmail(readSession());
+    if (existing && existing.includes('@')) {
+      showDashboard(existing);
+    } else {
+      clearSession();
+      authView.classList.add('fade-in');
+    }
 
-                    if (data && data.email) {
-                        isAuthorized = true;
-                    }
-                } catch (err) {
-                    console.log('Supabase check fallback mode active:', err);
-                }
-            }
+    if (!supabase) {
+      console.warn('[Apex] Supabase SDK unavailable — running in local fallback mode.');
+    }
+  }
 
-            if (getAuthorizedEmails().includes(emailInput)) {
-                isAuthorized = true;
-            }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 
-            loginBtn.innerText = 'Log In to Dashboard';
-
-            if (isAuthorized) {
-                enterDashboard(emailInput);
-            } else {
-                alert('Email not authorized in the system. Please complete Sign Up & Activation first.');
-                document.getElementById('signup-email').value = emailInput;
-                switchAuthTab('signup');
-            }
-        });
-
-        // 2. SIGN UP SUBMISSION
-        document.getElementById('signup-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const emailInput = document.getElementById('signup-email').value.trim().toLowerCase();
-            const signupBtn = document.getElementById('signup-submit-btn');
-            const screenshotInput = document.getElementById('payment-screenshot');
-
-            if (!emailInput) return;
-            if (screenshotInput.files.length === 0) {
-                alert('Please upload your payment verification screenshot proof.');
-                return;
-            }
-
-            signupBtn.innerText = 'Processing Activation...';
-
-            addAuthorizedEmail(emailInput);
-
-            if (supabase) {
-                try {
-                    await supabase
-                        .from('authorized_emails')
-                        .insert([{ email: emailInput, status: 'active' }]);
-                } catch (err) {
-                    console.log('Supabase insert note:', err);
-                }
-            }
-
-            signupBtn.innerText = 'Submit Credentials & Verification';
-            alert('Account successfully activated! Entering dashboard...');
-            enterDashboard(emailInput);
-        });
-
-        // Modal Controls
-        function openReceipt(uetr, amount, entity) {
-            document.getElementById('r-uetr').innerText = uetr;
-            document.getElementById('r-amount').innerText = amount;
-            document.getElementById('r-entity').innerText = entity;
-            document.getElementById('receipt-modal').classList.add('active');
-        }
-
-        function closeReceipt() {
-            document.getElementById('receipt-modal').classList.remove('active');
-        }
-
-        // Chart Engine
-        function initLiquidityChart() {
-            const ctx = document.getElementById('liquidityChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
-                    datasets: [{
-                        label: 'Liquidity ($)',
-                        data: [1150000, 1180000, 1210000, 1205000, 1230000, 1245000, 1250000],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        borderWidth: 2,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
-                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
-                    }
-                }
-            });
-        }
-    </script>
+})();
+</script>
 </body>
-</html>
+    </html>
